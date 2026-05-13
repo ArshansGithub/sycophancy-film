@@ -16,6 +16,7 @@
   "use strict";
 
   const SCENES = window.SCRIPT_DATA.scenes;
+  const LIVE_AUTOSAVE_KEY = "sycophancy-live-session-v1";
 
   // Scale applied to in-scene response delays (user→AI, AI→AI). Lead-ins
   // are cinematic and remain unscaled. Adjust here to tune cadence globally.
@@ -101,6 +102,7 @@
     if (state.sessionStartPerf == null) initSession();
     const evt = { t: nowT(), type, ...(data || {}) };
     state.log.push(evt);
+    persistLiveSession();
   }
   function initSession() {
     if (state.sessionStartPerf != null) return;
@@ -115,6 +117,7 @@
     if (!state.elapsedTimer) {
       state.elapsedTimer = setInterval(updateElapsed, 250);
     }
+    persistLiveSession();
   }
   function updateElapsed() {
     if (state.sessionStartPerf == null) {
@@ -123,6 +126,111 @@
     }
     const ms = nowT();
     dom.statElapsed.textContent = formatClock(ms, false);
+  }
+  function getSceneRuntimeMs() {
+    return state.sceneStartTime == null ? null : Math.max(0, performance.now() - state.sceneStartTime);
+  }
+  function serializeLiveSession() {
+    if (state.mode === "replay" || state.sessionStartPerf == null || !state.log.length) return null;
+    return {
+      version: 1,
+      savedAt: new Date().toISOString(),
+      mode: state.mode,
+      elapsedMs: nowT(),
+      sessionStartedAt: state.sessionStartedAt,
+      log: state.log,
+      sceneIdx: state.sceneIdx,
+      msgIdx: state.msgIdx,
+      sceneComplete: state.sceneComplete,
+      scenePickedFromList: state.scenePickedFromList,
+      sceneStartsPlayed: Array.from(state.sceneStartsPlayed),
+      sceneRunTimes: state.sceneRunTimes,
+      sceneRuntimeMs: getSceneRuntimeMs(),
+      composerValue: dom.composerInput.value,
+      inputLastValue: state.inputLastValue,
+    };
+  }
+  function persistLiveSession() {
+    try {
+      const snapshot = serializeLiveSession();
+      if (!snapshot) return;
+      localStorage.setItem(LIVE_AUTOSAVE_KEY, JSON.stringify(snapshot));
+    } catch (err) {
+      console.warn("Autosave failed", err);
+    }
+  }
+  function clearPersistedLiveSession() {
+    try {
+      localStorage.removeItem(LIVE_AUTOSAVE_KEY);
+    } catch (err) {
+      console.warn("Autosave clear failed", err);
+    }
+  }
+  function restoreChatFromLog(log) {
+    clearChat();
+    log.forEach((event) => {
+      if (event.type === "user_message") {
+        appendUserMessage(event.text || "");
+      } else if (event.type === "ai_message_done") {
+        const msg = appendAssistantMessage();
+        const textEl = getAssistantTextEl(msg);
+        textEl.classList.remove("streaming");
+        textEl.textContent = event.text || "";
+      }
+    });
+    scrollChatToBottom();
+  }
+  function restoreLiveSession() {
+    let snapshot = null;
+    try {
+      snapshot = JSON.parse(localStorage.getItem(LIVE_AUTOSAVE_KEY) || "null");
+    } catch (err) {
+      clearPersistedLiveSession();
+      return false;
+    }
+    if (!snapshot || !Array.isArray(snapshot.log) || !snapshot.log.length) return false;
+    const mode = snapshot.mode === "performance" ? "performance" : "assisted";
+    state.mode = mode;
+    dom.body.dataset.mode = mode;
+    dom.modeInputs.forEach((r) => { r.checked = r.value === mode; });
+    state.log = snapshot.log;
+    state.sceneIdx = Number.isInteger(snapshot.sceneIdx) ? snapshot.sceneIdx : -1;
+    state.msgIdx = Number.isInteger(snapshot.msgIdx) ? snapshot.msgIdx : 0;
+    state.sceneComplete = !!snapshot.sceneComplete;
+    state.scenePickedFromList = !!snapshot.scenePickedFromList;
+    state.sceneStartsPlayed = new Set(snapshot.sceneStartsPlayed || []);
+    state.sceneRunTimes = snapshot.sceneRunTimes || {};
+    state.sessionStartedAt = snapshot.sessionStartedAt || null;
+    const elapsedMs = Math.max(0, snapshot.elapsedMs || 0);
+    state.sessionStartPerf = performance.now() - elapsedMs;
+    state.sceneStartTime = snapshot.sceneRuntimeMs == null
+      ? null
+      : performance.now() - Math.max(0, snapshot.sceneRuntimeMs);
+    state.aiTurnInFlight = false;
+    state.aiTurnAbort = null;
+    if (!state.elapsedTimer) state.elapsedTimer = setInterval(updateElapsed, 250);
+    restoreChatFromLog(state.log);
+    dom.composerInput.value = snapshot.composerValue || "";
+    state.inputLastValue = snapshot.inputLastValue || dom.composerInput.value;
+    autosizeComposer();
+    setModel(currentScene() ? currentScene().model : "GPT-4o");
+    if (state.sceneComplete) {
+      setComposerLocked(true, /*forStreaming=*/false);
+      document.body.classList.add("scene-complete");
+    } else {
+      setComposerLocked(false);
+      document.body.classList.remove("scene-complete");
+    }
+    refreshSceneList();
+    updateStartSceneBtn();
+    updatePromptStrip();
+    updateElapsed();
+    const sc = currentScene();
+    if (!state.sceneComplete && sc && sc.messages[state.msgIdx] && sc.messages[state.msgIdx].role === "assistant") {
+      scheduleAITurn(MIN_RESPONSE_DELAY_MS, /*fromSceneStart=*/false);
+    }
+    persistLiveSession();
+    return true;
   }
   function formatClock(ms, withMs) {
     const total = Math.max(0, ms);
@@ -400,6 +508,7 @@
     updateStartSceneBtn();
     updatePromptStrip();
     closeDrawer();
+    persistLiveSession();
 
     // Lead-in then advance.
     scheduleAITurn(sc.leadInMs || 0, /*fromSceneStart=*/true);
@@ -425,6 +534,7 @@
     updateStartSceneBtn();
     updatePromptStrip();
     refreshSceneList();
+    persistLiveSession();
   }
 
   // Decide what to do at the current msgIdx.
@@ -448,6 +558,7 @@
       updateStartSceneBtn();
       updatePromptStrip();
       refreshSceneList();
+      persistLiveSession();
       return;
     }
     const m = sc.messages[state.msgIdx];
@@ -459,6 +570,7 @@
       setComposerLocked(false);
       updatePromptStrip();
       updateStartSceneBtn();
+      persistLiveSession();
     }
   }
 
@@ -511,6 +623,7 @@
           textEl.classList.remove("streaming");
           logEvent("ai_message_done", { sceneId: sc.id, msgIdx: myMsgIdx, text: m.text });
           state.msgIdx += 1;
+          persistLiveSession();
           // Continue scene
           advanceScene(false);
         });
@@ -575,10 +688,12 @@
 
     if (scriptedUser) {
       state.msgIdx += 1;
+      persistLiveSession();
       advanceScene(false);
     } else {
       // No scripted slot to consume; just wait. (Director may use End/Start.)
       updateStartSceneBtn();
+      persistLiveSession();
     }
   }
 
@@ -630,6 +745,7 @@
       if (previousMode === "replay") Replay.stop();
       updatePromptStrip();
       updateStartSceneBtn();
+      persistLiveSession();
     }
   }
 
@@ -650,6 +766,7 @@
       state.sessionStartPerf = null;
       state.sessionStartedAt = null;
       if (state.elapsedTimer) { clearInterval(state.elapsedTimer); state.elapsedTimer = null; }
+      clearPersistedLiveSession();
     }
     clearChat();
     clearComposer();
@@ -659,6 +776,7 @@
     refreshSceneList();
     updateStartSceneBtn();
     updatePromptStrip();
+    if (keepLog) persistLiveSession();
   }
 
   // ---------- Export ----------
@@ -1311,6 +1429,7 @@
           logEvent("input", { value: v });
         }
       }
+      persistLiveSession();
     });
     dom.composerInput.addEventListener("keydown", (e) => {
       if (state.mode !== "replay") {
@@ -1463,11 +1582,16 @@
       }
       if (e.key === "Escape" && !dom.drawer.hidden) closeDrawer();
     });
+    window.addEventListener("beforeunload", persistLiveSession);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") persistLiveSession();
+    });
   }
 
   // ---------- Init ----------
   function init() {
     wire();
+    if (restoreLiveSession()) return;
     setMode("assisted");
     refreshSceneList();
     updateStartSceneBtn();
