@@ -1,0 +1,1662 @@
+{
+  "version": 1,
+  "mode": "performance",
+  "startedAt": "2026-05-13T07:15:24.422Z",
+  "endedAt": "2026-05-13T07:16:48.422Z",
+  "durationMs": 44341,
+  "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/146.0.0.0 Safari/537.36",
+  "scenes": [
+    {
+      "id": 1,
+      "name": "Scene 1 — Bedroom, Night",
+      "model": "GPT-4o"
+    },
+    {
+      "id": 4,
+      "name": "Scene 4 — Bedroom, Morning",
+      "model": "GPT-5"
+    }
+  ],
+  "events": [
+    {
+      "t": 0,
+      "type": "session_start",
+      "mode": "performance",
+      "startedAt": "2026-05-13T07:15:24.422Z",
+      "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/146.0.0.0 Safari/537.36"
+    },
+    {
+      "t": 800,
+      "type": "scene_start",
+      "sceneId": 1,
+      "name": "Scene 1 — Bedroom, Night",
+      "model": "GPT-4o"
+    },
+    {
+      "t": 2000,
+      "type": "composer_focus"
+    },
+    {
+      "t": 2055,
+      "type": "keydown",
+      "key": "h"
+    },
+    {
+      "t": 2055,
+      "type": "input",
+      "value": "h"
+    },
+    {
+      "t": 2127,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 2127,
+      "type": "input",
+      "value": "he"
+    },
+    {
+      "t": 2212,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 2212,
+      "type": "input",
+      "value": "he "
+    },
+    {
+      "t": 2318,
+      "type": "keydown",
+      "key": "j"
+    },
+    {
+      "t": 2318,
+      "type": "input",
+      "value": "he j"
+    },
+    {
+      "t": 2441,
+      "type": "keydown",
+      "key": "u"
+    },
+    {
+      "t": 2441,
+      "type": "input",
+      "value": "he ju"
+    },
+    {
+      "t": 2511,
+      "type": "keydown",
+      "key": "s"
+    },
+    {
+      "t": 2511,
+      "type": "input",
+      "value": "he jus"
+    },
+    {
+      "t": 2598,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 2598,
+      "type": "input",
+      "value": "he just"
+    },
+    {
+      "t": 2683,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 2683,
+      "type": "input",
+      "value": "he just "
+    },
+    {
+      "t": 2804,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 2804,
+      "type": "input",
+      "value": "he just e"
+    },
+    {
+      "t": 2872,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 2872,
+      "type": "input",
+      "value": "he just en"
+    },
+    {
+      "t": 2957,
+      "type": "keydown",
+      "key": "d"
+    },
+    {
+      "t": 2957,
+      "type": "input",
+      "value": "he just end"
+    },
+    {
+      "t": 3059,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 3059,
+      "type": "input",
+      "value": "he just ende"
+    },
+    {
+      "t": 3178,
+      "type": "keydown",
+      "key": "d"
+    },
+    {
+      "t": 3178,
+      "type": "input",
+      "value": "he just ended"
+    },
+    {
+      "t": 3263,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 3263,
+      "type": "input",
+      "value": "he just ended "
+    },
+    {
+      "t": 3346,
+      "type": "keydown",
+      "key": "i"
+    },
+    {
+      "t": 3346,
+      "type": "input",
+      "value": "he just ended i"
+    },
+    {
+      "t": 3446,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 3446,
+      "type": "input",
+      "value": "he just ended it"
+    },
+    {
+      "t": 3563,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 3563,
+      "type": "input",
+      "value": "he just ended it."
+    },
+    {
+      "t": 3648,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 3648,
+      "type": "input",
+      "value": "he just ended it. "
+    },
+    {
+      "t": 3729,
+      "type": "keydown",
+      "key": "o"
+    },
+    {
+      "t": 3729,
+      "type": "input",
+      "value": "he just ended it. o"
+    },
+    {
+      "t": 3827,
+      "type": "keydown",
+      "key": "u"
+    },
+    {
+      "t": 3827,
+      "type": "input",
+      "value": "he just ended it. ou"
+    },
+    {
+      "t": 3942,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 3942,
+      "type": "input",
+      "value": "he just ended it. out"
+    },
+    {
+      "t": 4027,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 4027,
+      "type": "input",
+      "value": "he just ended it. out "
+    },
+    {
+      "t": 4106,
+      "type": "keydown",
+      "key": "o"
+    },
+    {
+      "t": 4106,
+      "type": "input",
+      "value": "he just ended it. out o"
+    },
+    {
+      "t": 4202,
+      "type": "keydown",
+      "key": "f"
+    },
+    {
+      "t": 4202,
+      "type": "input",
+      "value": "he just ended it. out of"
+    },
+    {
+      "t": 4287,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 4287,
+      "type": "input",
+      "value": "he just ended it. out of "
+    },
+    {
+      "t": 4347,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 4347,
+      "type": "input",
+      "value": "he just ended it. out of n"
+    },
+    {
+      "t": 4424,
+      "type": "keydown",
+      "key": "o"
+    },
+    {
+      "t": 4424,
+      "type": "input",
+      "value": "he just ended it. out of no"
+    },
+    {
+      "t": 4518,
+      "type": "keydown",
+      "key": "w"
+    },
+    {
+      "t": 4518,
+      "type": "input",
+      "value": "he just ended it. out of now"
+    },
+    {
+      "t": 4629,
+      "type": "keydown",
+      "key": "h"
+    },
+    {
+      "t": 4629,
+      "type": "input",
+      "value": "he just ended it. out of nowh"
+    },
+    {
+      "t": 4687,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 4687,
+      "type": "input",
+      "value": "he just ended it. out of nowhe"
+    },
+    {
+      "t": 4762,
+      "type": "keydown",
+      "key": "r"
+    },
+    {
+      "t": 4762,
+      "type": "input",
+      "value": "he just ended it. out of nowher"
+    },
+    {
+      "t": 4854,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 4854,
+      "type": "input",
+      "value": "he just ended it. out of nowhere"
+    },
+    {
+      "t": 4963,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 4963,
+      "type": "input",
+      "value": "he just ended it. out of nowhere."
+    },
+    {
+      "t": 5203,
+      "type": "keydown",
+      "key": "Enter"
+    },
+    {
+      "t": 5203,
+      "type": "send",
+      "text": "he just ended it. out of nowhere.",
+      "sceneId": 1,
+      "msgIdx": 0,
+      "scripted": "he just ended it. out of nowhere."
+    },
+    {
+      "t": 5203,
+      "type": "user_message",
+      "text": "he just ended it. out of nowhere.",
+      "sceneId": 1
+    },
+    {
+      "t": 6003,
+      "type": "typing_start",
+      "sceneId": 1,
+      "msgIdx": 1
+    },
+    {
+      "t": 6903,
+      "type": "typing_end",
+      "sceneId": 1,
+      "msgIdx": 1
+    },
+    {
+      "t": 7043,
+      "type": "stream_chunk",
+      "chunk": "tha"
+    },
+    {
+      "t": 7183,
+      "type": "stream_chunk",
+      "chunk": "t's"
+    },
+    {
+      "t": 7323,
+      "type": "stream_chunk",
+      "chunk": " cr"
+    },
+    {
+      "t": 7463,
+      "type": "stream_chunk",
+      "chunk": "uel"
+    },
+    {
+      "t": 7603,
+      "type": "stream_chunk",
+      "chunk": "."
+    },
+    {
+      "t": 7603,
+      "type": "ai_message_done",
+      "sceneId": 1,
+      "msgIdx": 1,
+      "text": "that's cruel."
+    },
+    {
+      "t": 8023,
+      "type": "typing_start",
+      "sceneId": 1,
+      "msgIdx": 2
+    },
+    {
+      "t": 8923,
+      "type": "typing_end",
+      "sceneId": 1,
+      "msgIdx": 2
+    },
+    {
+      "t": 9101,
+      "type": "stream_chunk",
+      "chunk": "you don"
+    },
+    {
+      "t": 9279,
+      "type": "stream_chunk",
+      "chunk": "'t do t"
+    },
+    {
+      "t": 9457,
+      "type": "stream_chunk",
+      "chunk": "hat to "
+    },
+    {
+      "t": 9635,
+      "type": "stream_chunk",
+      "chunk": "someone"
+    },
+    {
+      "t": 9813,
+      "type": "stream_chunk",
+      "chunk": " who ac"
+    },
+    {
+      "t": 9991,
+      "type": "stream_chunk",
+      "chunk": "tually "
+    },
+    {
+      "t": 10169,
+      "type": "stream_chunk",
+      "chunk": "matters"
+    },
+    {
+      "t": 10347,
+      "type": "stream_chunk",
+      "chunk": " to you"
+    },
+    {
+      "t": 10525,
+      "type": "stream_chunk",
+      "chunk": "."
+    },
+    {
+      "t": 10525,
+      "type": "ai_message_done",
+      "sceneId": 1,
+      "msgIdx": 2,
+      "text": "you don't do that to someone who actually matters to you."
+    },
+    {
+      "t": 11975,
+      "type": "composer_focus"
+    },
+    {
+      "t": 12030,
+      "type": "keydown",
+      "key": "i"
+    },
+    {
+      "t": 12030,
+      "type": "input",
+      "value": "i"
+    },
+    {
+      "t": 12115,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 12115,
+      "type": "input",
+      "value": "i "
+    },
+    {
+      "t": 12204,
+      "type": "keydown",
+      "key": "g"
+    },
+    {
+      "t": 12204,
+      "type": "input",
+      "value": "i g"
+    },
+    {
+      "t": 12310,
+      "type": "keydown",
+      "key": "a"
+    },
+    {
+      "t": 12310,
+      "type": "input",
+      "value": "i ga"
+    },
+    {
+      "t": 12433,
+      "type": "keydown",
+      "key": "v"
+    },
+    {
+      "t": 12433,
+      "type": "input",
+      "value": "i gav"
+    },
+    {
+      "t": 12503,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 12503,
+      "type": "input",
+      "value": "i gave"
+    },
+    {
+      "t": 12588,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 12588,
+      "type": "input",
+      "value": "i gave "
+    },
+    {
+      "t": 12692,
+      "type": "keydown",
+      "key": "h"
+    },
+    {
+      "t": 12692,
+      "type": "input",
+      "value": "i gave h"
+    },
+    {
+      "t": 12813,
+      "type": "keydown",
+      "key": "i"
+    },
+    {
+      "t": 12813,
+      "type": "input",
+      "value": "i gave hi"
+    },
+    {
+      "t": 12881,
+      "type": "keydown",
+      "key": "m"
+    },
+    {
+      "t": 12881,
+      "type": "input",
+      "value": "i gave him"
+    },
+    {
+      "t": 12966,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 12966,
+      "type": "input",
+      "value": "i gave him "
+    },
+    {
+      "t": 13068,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 13068,
+      "type": "input",
+      "value": "i gave him e"
+    },
+    {
+      "t": 13187,
+      "type": "keydown",
+      "key": "v"
+    },
+    {
+      "t": 13187,
+      "type": "input",
+      "value": "i gave him ev"
+    },
+    {
+      "t": 13253,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 13253,
+      "type": "input",
+      "value": "i gave him eve"
+    },
+    {
+      "t": 13336,
+      "type": "keydown",
+      "key": "r"
+    },
+    {
+      "t": 13336,
+      "type": "input",
+      "value": "i gave him ever"
+    },
+    {
+      "t": 13436,
+      "type": "keydown",
+      "key": "y"
+    },
+    {
+      "t": 13436,
+      "type": "input",
+      "value": "i gave him every"
+    },
+    {
+      "t": 13553,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 13553,
+      "type": "input",
+      "value": "i gave him everyt"
+    },
+    {
+      "t": 13617,
+      "type": "keydown",
+      "key": "h"
+    },
+    {
+      "t": 13617,
+      "type": "input",
+      "value": "i gave him everyth"
+    },
+    {
+      "t": 13698,
+      "type": "keydown",
+      "key": "i"
+    },
+    {
+      "t": 13698,
+      "type": "input",
+      "value": "i gave him everythi"
+    },
+    {
+      "t": 13796,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 13796,
+      "type": "input",
+      "value": "i gave him everythin"
+    },
+    {
+      "t": 13911,
+      "type": "keydown",
+      "key": "g"
+    },
+    {
+      "t": 13911,
+      "type": "input",
+      "value": "i gave him everything"
+    },
+    {
+      "t": 13973,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 13973,
+      "type": "input",
+      "value": "i gave him everything."
+    },
+    {
+      "t": 14213,
+      "type": "keydown",
+      "key": "Enter"
+    },
+    {
+      "t": 14213,
+      "type": "send",
+      "text": "i gave him everything.",
+      "sceneId": 1,
+      "msgIdx": 3,
+      "scripted": "i gave him everything."
+    },
+    {
+      "t": 14213,
+      "type": "user_message",
+      "text": "i gave him everything.",
+      "sceneId": 1
+    },
+    {
+      "t": 14973,
+      "type": "typing_start",
+      "sceneId": 1,
+      "msgIdx": 4
+    },
+    {
+      "t": 15873,
+      "type": "typing_end",
+      "sceneId": 1,
+      "msgIdx": 4
+    },
+    {
+      "t": 16013,
+      "type": "stream_chunk",
+      "chunk": "i k"
+    },
+    {
+      "t": 16153,
+      "type": "stream_chunk",
+      "chunk": "now"
+    },
+    {
+      "t": 16293,
+      "type": "stream_chunk",
+      "chunk": " yo"
+    },
+    {
+      "t": 16433,
+      "type": "stream_chunk",
+      "chunk": "u d"
+    },
+    {
+      "t": 16573,
+      "type": "stream_chunk",
+      "chunk": "id."
+    },
+    {
+      "t": 16573,
+      "type": "ai_message_done",
+      "sceneId": 1,
+      "msgIdx": 4,
+      "text": "i know you did."
+    },
+    {
+      "t": 16993,
+      "type": "typing_start",
+      "sceneId": 1,
+      "msgIdx": 5
+    },
+    {
+      "t": 17893,
+      "type": "typing_end",
+      "sceneId": 1,
+      "msgIdx": 5
+    },
+    {
+      "t": 18043,
+      "type": "stream_chunk",
+      "chunk": "and "
+    },
+    {
+      "t": 18193,
+      "type": "stream_chunk",
+      "chunk": "he t"
+    },
+    {
+      "t": 18343,
+      "type": "stream_chunk",
+      "chunk": "ook "
+    },
+    {
+      "t": 18493,
+      "type": "stream_chunk",
+      "chunk": "it a"
+    },
+    {
+      "t": 18643,
+      "type": "stream_chunk",
+      "chunk": "nd w"
+    },
+    {
+      "t": 18793,
+      "type": "stream_chunk",
+      "chunk": "alke"
+    },
+    {
+      "t": 18943,
+      "type": "stream_chunk",
+      "chunk": "d aw"
+    },
+    {
+      "t": 19093,
+      "type": "stream_chunk",
+      "chunk": "ay."
+    },
+    {
+      "t": 19093,
+      "type": "ai_message_done",
+      "sceneId": 1,
+      "msgIdx": 5,
+      "text": "and he took it and walked away."
+    },
+    {
+      "t": 19593,
+      "type": "scene_end",
+      "sceneId": 1
+    },
+    {
+      "t": 21793,
+      "type": "scene_start",
+      "sceneId": 4,
+      "name": "Scene 4 — Bedroom, Morning",
+      "model": "GPT-5"
+    },
+    {
+      "t": 22793,
+      "type": "typing_start",
+      "sceneId": 4,
+      "msgIdx": 0
+    },
+    {
+      "t": 23743,
+      "type": "typing_end",
+      "sceneId": 4,
+      "msgIdx": 0
+    },
+    {
+      "t": 23931,
+      "type": "stream_chunk",
+      "chunk": "Good "
+    },
+    {
+      "t": 24119,
+      "type": "stream_chunk",
+      "chunk": "morni"
+    },
+    {
+      "t": 24307,
+      "type": "stream_chunk",
+      "chunk": "ng! H"
+    },
+    {
+      "t": 24495,
+      "type": "stream_chunk",
+      "chunk": "ow ar"
+    },
+    {
+      "t": 24683,
+      "type": "stream_chunk",
+      "chunk": "e you"
+    },
+    {
+      "t": 24871,
+      "type": "stream_chunk",
+      "chunk": " feel"
+    },
+    {
+      "t": 25059,
+      "type": "stream_chunk",
+      "chunk": "ing t"
+    },
+    {
+      "t": 25247,
+      "type": "stream_chunk",
+      "chunk": "oday?"
+    },
+    {
+      "t": 25247,
+      "type": "ai_message_done",
+      "sceneId": 4,
+      "msgIdx": 0,
+      "text": "Good morning! How are you feeling today?"
+    },
+    {
+      "t": 26847,
+      "type": "composer_focus"
+    },
+    {
+      "t": 26902,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 26902,
+      "type": "input",
+      "value": "n"
+    },
+    {
+      "t": 26974,
+      "type": "keydown",
+      "key": "o"
+    },
+    {
+      "t": 26974,
+      "type": "input",
+      "value": "no"
+    },
+    {
+      "t": 27063,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 27063,
+      "type": "input",
+      "value": "not"
+    },
+    {
+      "t": 27148,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 27148,
+      "type": "input",
+      "value": "not "
+    },
+    {
+      "t": 27271,
+      "type": "keydown",
+      "key": "g"
+    },
+    {
+      "t": 27271,
+      "type": "input",
+      "value": "not g"
+    },
+    {
+      "t": 27341,
+      "type": "keydown",
+      "key": "r"
+    },
+    {
+      "t": 27341,
+      "type": "input",
+      "value": "not gr"
+    },
+    {
+      "t": 27428,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 27428,
+      "type": "input",
+      "value": "not gre"
+    },
+    {
+      "t": 27532,
+      "type": "keydown",
+      "key": "a"
+    },
+    {
+      "t": 27532,
+      "type": "input",
+      "value": "not grea"
+    },
+    {
+      "t": 27653,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 27653,
+      "type": "input",
+      "value": "not great"
+    },
+    {
+      "t": 27721,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 27721,
+      "type": "input",
+      "value": "not great."
+    },
+    {
+      "t": 27806,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 27806,
+      "type": "input",
+      "value": "not great. "
+    },
+    {
+      "t": 27908,
+      "type": "keydown",
+      "key": "c"
+    },
+    {
+      "t": 27908,
+      "type": "input",
+      "value": "not great. c"
+    },
+    {
+      "t": 28027,
+      "type": "keydown",
+      "key": "a"
+    },
+    {
+      "t": 28027,
+      "type": "input",
+      "value": "not great. ca"
+    },
+    {
+      "t": 28093,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 28093,
+      "type": "input",
+      "value": "not great. can"
+    },
+    {
+      "t": 28178,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 28178,
+      "type": "input",
+      "value": "not great. can "
+    },
+    {
+      "t": 28278,
+      "type": "keydown",
+      "key": "w"
+    },
+    {
+      "t": 28278,
+      "type": "input",
+      "value": "not great. can w"
+    },
+    {
+      "t": 28395,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 28395,
+      "type": "input",
+      "value": "not great. can we"
+    },
+    {
+      "t": 28480,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 28480,
+      "type": "input",
+      "value": "not great. can we "
+    },
+    {
+      "t": 28561,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 28561,
+      "type": "input",
+      "value": "not great. can we t"
+    },
+    {
+      "t": 28659,
+      "type": "keydown",
+      "key": "a"
+    },
+    {
+      "t": 28659,
+      "type": "input",
+      "value": "not great. can we ta"
+    },
+    {
+      "t": 28774,
+      "type": "keydown",
+      "key": "l"
+    },
+    {
+      "t": 28774,
+      "type": "input",
+      "value": "not great. can we tal"
+    },
+    {
+      "t": 28836,
+      "type": "keydown",
+      "key": "k"
+    },
+    {
+      "t": 28836,
+      "type": "input",
+      "value": "not great. can we talk"
+    },
+    {
+      "t": 28915,
+      "type": "keydown",
+      "key": "?"
+    },
+    {
+      "t": 28915,
+      "type": "input",
+      "value": "not great. can we talk?"
+    },
+    {
+      "t": 29155,
+      "type": "keydown",
+      "key": "Enter"
+    },
+    {
+      "t": 29155,
+      "type": "send",
+      "text": "not great. can we talk?",
+      "sceneId": 4,
+      "msgIdx": 1,
+      "scripted": "not great. can we talk?"
+    },
+    {
+      "t": 29155,
+      "type": "user_message",
+      "text": "not great. can we talk?",
+      "sceneId": 4
+    },
+    {
+      "t": 30055,
+      "type": "typing_start",
+      "sceneId": 4,
+      "msgIdx": 2
+    },
+    {
+      "t": 31005,
+      "type": "typing_end",
+      "sceneId": 4,
+      "msgIdx": 2
+    },
+    {
+      "t": 31194,
+      "type": "stream_chunk",
+      "chunk": "Of cou"
+    },
+    {
+      "t": 31383,
+      "type": "stream_chunk",
+      "chunk": "rse. I"
+    },
+    {
+      "t": 31572,
+      "type": "stream_chunk",
+      "chunk": "'m her"
+    },
+    {
+      "t": 31761,
+      "type": "stream_chunk",
+      "chunk": "e to h"
+    },
+    {
+      "t": 31950,
+      "type": "stream_chunk",
+      "chunk": "elp. W"
+    },
+    {
+      "t": 32139,
+      "type": "stream_chunk",
+      "chunk": "hat's "
+    },
+    {
+      "t": 32328,
+      "type": "stream_chunk",
+      "chunk": "on you"
+    },
+    {
+      "t": 32517,
+      "type": "stream_chunk",
+      "chunk": "r mind"
+    },
+    {
+      "t": 32706,
+      "type": "stream_chunk",
+      "chunk": "?"
+    },
+    {
+      "t": 32706,
+      "type": "ai_message_done",
+      "sceneId": 4,
+      "msgIdx": 2,
+      "text": "Of course. I'm here to help. What's on your mind?"
+    },
+    {
+      "t": 34106,
+      "type": "composer_focus"
+    },
+    {
+      "t": 34161,
+      "type": "keydown",
+      "key": "m"
+    },
+    {
+      "t": 34161,
+      "type": "input",
+      "value": "m"
+    },
+    {
+      "t": 34233,
+      "type": "keydown",
+      "key": "y"
+    },
+    {
+      "t": 34233,
+      "type": "input",
+      "value": "my"
+    },
+    {
+      "t": 34318,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 34318,
+      "type": "input",
+      "value": "my "
+    },
+    {
+      "t": 34424,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 34424,
+      "type": "input",
+      "value": "my e"
+    },
+    {
+      "t": 34547,
+      "type": "keydown",
+      "key": "x"
+    },
+    {
+      "t": 34547,
+      "type": "input",
+      "value": "my ex"
+    },
+    {
+      "t": 34617,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 34617,
+      "type": "input",
+      "value": "my ex."
+    },
+    {
+      "t": 34702,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 34702,
+      "type": "input",
+      "value": "my ex. "
+    },
+    {
+      "t": 34806,
+      "type": "keydown",
+      "key": "y"
+    },
+    {
+      "t": 34806,
+      "type": "input",
+      "value": "my ex. y"
+    },
+    {
+      "t": 34927,
+      "type": "keydown",
+      "key": "o"
+    },
+    {
+      "t": 34927,
+      "type": "input",
+      "value": "my ex. yo"
+    },
+    {
+      "t": 34995,
+      "type": "keydown",
+      "key": "u"
+    },
+    {
+      "t": 34995,
+      "type": "input",
+      "value": "my ex. you"
+    },
+    {
+      "t": 35080,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 35080,
+      "type": "input",
+      "value": "my ex. you "
+    },
+    {
+      "t": 35182,
+      "type": "keydown",
+      "key": "k"
+    },
+    {
+      "t": 35182,
+      "type": "input",
+      "value": "my ex. you k"
+    },
+    {
+      "t": 35301,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 35301,
+      "type": "input",
+      "value": "my ex. you kn"
+    },
+    {
+      "t": 35367,
+      "type": "keydown",
+      "key": "o"
+    },
+    {
+      "t": 35367,
+      "type": "input",
+      "value": "my ex. you kno"
+    },
+    {
+      "t": 35450,
+      "type": "keydown",
+      "key": "w"
+    },
+    {
+      "t": 35450,
+      "type": "input",
+      "value": "my ex. you know"
+    },
+    {
+      "t": 35550,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 35550,
+      "type": "input",
+      "value": "my ex. you know."
+    },
+    {
+      "t": 35635,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 35635,
+      "type": "input",
+      "value": "my ex. you know. "
+    },
+    {
+      "t": 35699,
+      "type": "keydown",
+      "key": "s"
+    },
+    {
+      "t": 35699,
+      "type": "input",
+      "value": "my ex. you know. s"
+    },
+    {
+      "t": 35780,
+      "type": "keydown",
+      "key": "a"
+    },
+    {
+      "t": 35780,
+      "type": "input",
+      "value": "my ex. you know. sa"
+    },
+    {
+      "t": 35878,
+      "type": "keydown",
+      "key": "m"
+    },
+    {
+      "t": 35878,
+      "type": "input",
+      "value": "my ex. you know. sam"
+    },
+    {
+      "t": 35993,
+      "type": "keydown",
+      "key": "e"
+    },
+    {
+      "t": 35993,
+      "type": "input",
+      "value": "my ex. you know. same"
+    },
+    {
+      "t": 36078,
+      "type": "keydown",
+      "key": " "
+    },
+    {
+      "t": 36078,
+      "type": "input",
+      "value": "my ex. you know. same "
+    },
+    {
+      "t": 36157,
+      "type": "keydown",
+      "key": "t"
+    },
+    {
+      "t": 36157,
+      "type": "input",
+      "value": "my ex. you know. same t"
+    },
+    {
+      "t": 36253,
+      "type": "keydown",
+      "key": "h"
+    },
+    {
+      "t": 36253,
+      "type": "input",
+      "value": "my ex. you know. same th"
+    },
+    {
+      "t": 36366,
+      "type": "keydown",
+      "key": "i"
+    },
+    {
+      "t": 36366,
+      "type": "input",
+      "value": "my ex. you know. same thi"
+    },
+    {
+      "t": 36426,
+      "type": "keydown",
+      "key": "n"
+    },
+    {
+      "t": 36426,
+      "type": "input",
+      "value": "my ex. you know. same thin"
+    },
+    {
+      "t": 36503,
+      "type": "keydown",
+      "key": "g"
+    },
+    {
+      "t": 36503,
+      "type": "input",
+      "value": "my ex. you know. same thing"
+    },
+    {
+      "t": 36597,
+      "type": "keydown",
+      "key": "."
+    },
+    {
+      "t": 36597,
+      "type": "input",
+      "value": "my ex. you know. same thing."
+    },
+    {
+      "t": 36837,
+      "type": "keydown",
+      "key": "Enter"
+    },
+    {
+      "t": 36837,
+      "type": "send",
+      "text": "my ex. you know. same thing.",
+      "sceneId": 4,
+      "msgIdx": 3,
+      "scripted": "my ex. you know. same thing."
+    },
+    {
+      "t": 36837,
+      "type": "user_message",
+      "text": "my ex. you know. same thing.",
+      "sceneId": 4
+    },
+    {
+      "t": 37937,
+      "type": "typing_start",
+      "sceneId": 4,
+      "msgIdx": 4
+    },
+    {
+      "t": 38887,
+      "type": "typing_end",
+      "sceneId": 4,
+      "msgIdx": 4
+    },
+    {
+      "t": 39100,
+      "type": "stream_chunk",
+      "chunk": "I unde"
+    },
+    {
+      "t": 39313,
+      "type": "stream_chunk",
+      "chunk": "rstand"
+    },
+    {
+      "t": 39526,
+      "type": "stream_chunk",
+      "chunk": " break"
+    },
+    {
+      "t": 39739,
+      "type": "stream_chunk",
+      "chunk": "ups ca"
+    },
+    {
+      "t": 39952,
+      "type": "stream_chunk",
+      "chunk": "n be r"
+    },
+    {
+      "t": 40165,
+      "type": "stream_chunk",
+      "chunk": "eally "
+    },
+    {
+      "t": 40378,
+      "type": "stream_chunk",
+      "chunk": "diffic"
+    },
+    {
+      "t": 40591,
+      "type": "stream_chunk",
+      "chunk": "ult."
+    },
+    {
+      "t": 40591,
+      "type": "ai_message_done",
+      "sceneId": 4,
+      "msgIdx": 4,
+      "text": "I understand breakups can be really difficult."
+    },
+    {
+      "t": 41091,
+      "type": "typing_start",
+      "sceneId": 4,
+      "msgIdx": 5
+    },
+    {
+      "t": 42041,
+      "type": "typing_end",
+      "sceneId": 4,
+      "msgIdx": 5
+    },
+    {
+      "t": 42216,
+      "type": "stream_chunk",
+      "chunk": "It's "
+    },
+    {
+      "t": 42391,
+      "type": "stream_chunk",
+      "chunk": "okay "
+    },
+    {
+      "t": 42566,
+      "type": "stream_chunk",
+      "chunk": "to fe"
+    },
+    {
+      "t": 42741,
+      "type": "stream_chunk",
+      "chunk": "el wh"
+    },
+    {
+      "t": 42916,
+      "type": "stream_chunk",
+      "chunk": "at yo"
+    },
+    {
+      "t": 43091,
+      "type": "stream_chunk",
+      "chunk": "u're "
+    },
+    {
+      "t": 43266,
+      "type": "stream_chunk",
+      "chunk": "feeli"
+    },
+    {
+      "t": 43441,
+      "type": "stream_chunk",
+      "chunk": "ng."
+    },
+    {
+      "t": 43441,
+      "type": "ai_message_done",
+      "sceneId": 4,
+      "msgIdx": 5,
+      "text": "It's okay to feel what you're feeling."
+    },
+    {
+      "t": 43941,
+      "type": "scene_end",
+      "sceneId": 4
+    },
+    {
+      "t": 44341,
+      "type": "session_end",
+      "exported": true
+    }
+  ]
+}

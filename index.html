@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="theme-color" content="#212121" />
+  <title>ChatGPT</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-mode="assisted">
+  <!-- App shell -->
+  <div id="app">
+    <header id="topbar">
+      <button id="menuBtn" class="icon-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+      </button>
+      <div id="modelLabel" class="model-label">
+        <span id="modelName">ChatGPT 4o</span>
+        <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true" class="chev">
+          <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <button id="rightSpacer" class="icon-btn ghost" aria-hidden="true" tabindex="-1">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
+    </header>
+
+    <main id="chat" class="chat" aria-live="polite"></main>
+
+    <!-- Assisted-mode prompt strip: actor-facing, never enters chat -->
+    <div id="promptStrip" class="prompt-strip" hidden>
+      <div class="prompt-strip-inner">
+        <span class="prompt-label">type:</span>
+        <span id="promptText" class="prompt-text"></span>
+      </div>
+    </div>
+
+    <footer id="composerWrap">
+      <form id="composer" class="composer" autocomplete="off">
+        <div class="composer-pill">
+          <button type="button" id="attachBtn" class="composer-icon-btn" aria-label="Attach">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+          </button>
+          <textarea
+            id="composerInput"
+            class="composer-input"
+            placeholder="Ask anything"
+            rows="1"
+            autocomplete="off"
+            autocapitalize="sentences"
+            spellcheck="false"
+          ></textarea>
+          <button type="button" id="micBtn" class="composer-icon-btn mic-btn" aria-label="Voice">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <rect x="9" y="3" width="6" height="12" rx="3" fill="currentColor"/>
+              <path d="M5 11a7 7 0 0014 0M12 18v3M8.5 21h7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button type="submit" id="sendBtn" class="send-btn" aria-label="Send">
+            <svg class="ico-send" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <svg class="ico-stop" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </footer>
+  </div>
+
+  <!-- Hamburger drawer -->
+  <div id="drawerScrim" class="drawer-scrim" hidden></div>
+  <aside id="drawer" class="drawer" hidden aria-hidden="true">
+    <div class="drawer-header">
+      <button id="drawerCloseBtn" class="icon-btn" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
+      <span class="drawer-title">Director</span>
+    </div>
+
+    <!-- Always-visible mode switcher (works in both Live and Replay) -->
+    <section class="drawer-section drawer-mode-section">
+      <h3 class="drawer-heading">Mode</h3>
+      <div class="mode-switch" role="radiogroup" aria-label="Mode">
+        <label><input type="radio" name="mode" value="assisted" checked /> <span>Assisted</span></label>
+        <label><input type="radio" name="mode" value="performance" /> <span>Performance</span></label>
+        <label><input type="radio" name="mode" value="replay" /> <span>Replay</span></label>
+      </div>
+    </section>
+
+    <!-- Live/Performance panel -->
+    <section id="livePanel" class="drawer-section">
+      <h3 class="drawer-heading">Scenes</h3>
+      <ol id="sceneList" class="scene-list"></ol>
+
+      <div class="row">
+        <button id="startSceneBtn" class="primary-btn">Start scene</button>
+        <button id="endSceneBtn" class="ghost-btn" disabled>End scene</button>
+      </div>
+
+      <h3 class="drawer-heading">Session</h3>
+      <div class="stats">
+        <div><span class="k">Elapsed</span><span id="statElapsed" class="v">0:00</span></div>
+        <div><span class="k">Messages</span><span id="statMsgs" class="v">0</span></div>
+        <div><span class="k">Model</span><span id="statModel" class="v">GPT-4o</span></div>
+      </div>
+
+      <div class="row">
+        <button id="exportBtn" class="ghost-btn">Export JSON</button>
+        <button id="resetBtn" class="danger-btn">Reset session</button>
+      </div>
+
+      <h3 class="drawer-heading">Reference</h3>
+      <a class="ghost-btn panel-link" href="article.html" target="_blank" rel="noopener">Open article</a>
+
+      <h3 class="drawer-heading">Filming</h3>
+      <label class="toggle">
+        <input type="checkbox" id="wakeLockToggle" />
+        <span>Keep screen awake</span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="fullscreenToggle" />
+        <span>Fullscreen</span>
+      </label>
+    </section>
+
+    <!-- Replay panel -->
+    <section id="replayPanel" class="drawer-section">
+      <h3 class="drawer-heading">Replay</h3>
+
+      <label class="file-row">
+        <input type="file" id="replayFile" accept="application/json,.json" />
+        <span class="file-btn">Load session JSON…</span>
+        <span id="replayFileName" class="file-name">no file</span>
+      </label>
+
+      <div class="row">
+        <button id="rPlayBtn"    class="primary-btn" disabled>Play</button>
+        <button id="rPauseBtn"   class="ghost-btn"   disabled>Pause</button>
+        <button id="rStopBtn"    class="ghost-btn"   disabled>Stop</button>
+        <button id="rRestartBtn" class="ghost-btn"   disabled>Restart</button>
+      </div>
+
+      <div class="scrub">
+        <input type="range" id="rScrub" min="0" max="1000" value="0" step="1" disabled />
+        <div class="scrub-time"><span id="rTimeNow">0:00.000</span> / <span id="rTimeTotal">0:00.000</span></div>
+      </div>
+
+      <div class="row">
+        <label class="inline">
+          Speed
+          <select id="rSpeed">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+          </select>
+        </label>
+        <label class="inline">
+          Jump
+          <select id="rSceneJump" disabled><option value="">—</option></select>
+        </label>
+      </div>
+
+      <h3 class="drawer-heading">Recorded scenes</h3>
+      <div id="replayScenePicker" class="replay-scene-picker bd-empty">Load a session to choose scenes.</div>
+
+      <label class="toggle">
+        <input type="checkbox" id="rFullscreenToggle" />
+        <span>Fullscreen</span>
+      </label>
+
+      <h3 class="drawer-heading">Session breakdown</h3>
+      <div id="replayBreakdown" class="bd-empty">Load a session to inspect timing.</div>
+
+      <p class="hint">Hamburger auto-hides 3s after Play. Move/tap to reveal.</p>
+    </section>
+  </aside>
+
+  <!-- Replay-mode lone tap target (auto-hides) -->
+  <button id="replayMenuFab" class="replay-fab" hidden aria-label="Open replay menu">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  </button>
+
+  <script src="script-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,818 @@
+/* Sycophancy — ChatGPT-faithful dark theme */
+
+:root {
+  --bg:            #212121;
+  --bg-elev:      #2f2f2f;
+  --bg-elev-2:    #303030;
+  --bg-input:     #2f2f2f;
+  --line:         #3a3a3a;
+  --text:         #ececec;
+  --text-dim:     #b4b4b4;
+  --text-mute:    #8e8e8e;
+  --accent:       #ffffff;
+  --user-bubble:  #2f2f2f;
+  --send-bg:      #ffffff;
+  --send-fg:      #000000;
+  --danger:       #f04438;
+  --scrim:        rgba(0,0,0,0.55);
+  --safe-top:     env(safe-area-inset-top, 0px);
+  --safe-bot:     env(safe-area-inset-bottom, 0px);
+  --topbar-h:     52px;
+  --composer-h:   72px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--bg);
+}
+
+/* ---------- Top bar ---------- */
+
+#topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: calc(var(--safe-top) + 6px) 10px 6px;
+  height: calc(var(--topbar-h) + var(--safe-top));
+  background: var(--bg);
+  z-index: 5;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:hover { background: var(--bg-elev); }
+.icon-btn.ghost { opacity: 0; pointer-events: none; }
+
+.model-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, calc(-50% + var(--safe-top) / 2));
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-size: 17px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.model-label .chev { opacity: 0.7; transform: translateY(1px); }
+
+/* ---------- Chat scroll area ---------- */
+
+.chat {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 0 12px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* old Edge/IE */
+}
+.chat::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.chat::-webkit-scrollbar-thumb { background: transparent; }
+
+.msg {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 6px 16px;
+  display: flex;
+}
+.msg.user { justify-content: flex-end; }
+.msg.assistant { justify-content: flex-start; }
+
+.msg .bubble {
+  max-width: 78%;
+  border-radius: 22px;
+  padding: 10px 16px;
+  background: var(--user-bubble);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.msg.user .bubble {
+  border-bottom-right-radius: 22px;
+}
+
+/* Assistant rendered as flat text + avatar dot (ChatGPT style) */
+.msg.assistant .assistant-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  max-width: 100%;
+  padding-right: 12px;
+}
+.msg.assistant .avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--text-dim);
+  background: var(--bg);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.msg.assistant .avatar::after {
+  content: "";
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--text);
+  display: block;
+  opacity: 0.92;
+}
+.msg.assistant .assistant-text {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  flex: 1;
+  padding-top: 1px;
+}
+
+/* Streaming caret while AI streams */
+.assistant-text.streaming::after {
+  content: "";
+  display: inline-block;
+  width: 8px; height: 16px;
+  background: var(--text);
+  margin-left: 2px;
+  vertical-align: -3px;
+  animation: caret 1s steps(2,end) infinite;
+  border-radius: 1px;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+/* Typing indicator (three dots) */
+.msg.typing .assistant-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding-top: 4px;
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text);
+  display: inline-block;
+  animation: blink 1.15s infinite ease-in-out;
+}
+.dot:nth-child(2) { animation-delay: 0.18s; }
+.dot:nth-child(3) { animation-delay: 0.36s; }
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.45; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+
+/* ---------- Composer ---------- */
+
+#composerWrap {
+  background: linear-gradient(to top, var(--bg) 60%, rgba(33,33,33,0));
+  padding: 8px 12px calc(var(--safe-bot) + 12px);
+  z-index: 4;
+}
+
+.composer { margin: 0; }
+
+.composer-pill {
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg-input);
+  border-radius: 28px;
+  padding: 6px 6px 6px 6px;
+  min-height: 52px;
+  max-width: 760px;
+  margin: 0 auto;
+  gap: 2px;
+}
+
+.composer-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  max-height: 160px;
+  padding: 8px 6px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.composer-input::-webkit-scrollbar { display: none; width: 0; }
+.composer-input::placeholder { color: var(--text-mute); }
+
+.composer-icon-btn {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, background 0.15s;
+}
+.composer-icon-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+.composer-icon-btn:active { background: rgba(255,255,255,0.1); }
+
+/* Mic shows when no text; hidden when text is present (send shows instead) */
+.send-btn {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--send-bg);
+  color: var(--send-fg);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 2px;
+  transition: opacity 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.composer-pill.has-text .mic-btn { display: none; }
+.composer-pill.has-text .send-btn { display: inline-flex; }
+.composer-pill.streaming .mic-btn { display: none; }
+.composer-pill.streaming .send-btn { display: inline-flex; }
+
+.send-btn .ico-stop { display: none; }
+.composer-pill.streaming .send-btn .ico-send { display: none; }
+.composer-pill.streaming .send-btn .ico-stop { display: inline; }
+
+/* ---------- Prompt strip (Assisted only) ---------- */
+
+.prompt-strip {
+  background: var(--bg);
+  padding: 6px 12px 2px;
+  z-index: 3;
+}
+.prompt-strip-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  background: rgba(255, 220, 120, 0.10);
+  border: 1px dashed rgba(255, 220, 120, 0.35);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: #f6dc8f;
+  display: flex;
+  gap: 8px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+/* Queued ("next:") look-ahead: dimmer so actor reads but knows it isn't their turn yet */
+.prompt-strip.queued .prompt-strip-inner {
+  background: rgba(180, 180, 180, 0.06);
+  border-color: rgba(180, 180, 180, 0.22);
+  color: #b6b6b6;
+}
+.prompt-strip.queued .prompt-label { color: #8a8a8a; }
+.prompt-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  color: #c9a44a;
+  flex-shrink: 0;
+  padding-top: 2px;
+  font-weight: 600;
+}
+.prompt-text { white-space: pre-wrap; }
+
+/* ---------- Drawer ---------- */
+
+/* The HTML `hidden` attribute must beat .drawer/.drawer-scrim's display rules */
+.drawer[hidden], .drawer-scrim[hidden] { display: none !important; }
+
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  z-index: 50;
+  animation: fade .15s ease;
+}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.drawer {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: min(92vw, 360px);
+  background: #1a1a1a;
+  color: var(--text);
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  transform: translateX(0);
+  animation: slidein .18s ease;
+  overflow-y: auto;
+  padding-bottom: calc(var(--safe-bot) + 12px);
+}
+@keyframes slidein { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: calc(var(--safe-top) + 8px) 8px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.drawer-title {
+  font-size: 14px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.drawer-section {
+  padding: 12px 14px 8px;
+}
+.drawer-heading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-mute);
+  margin: 14px 0 8px;
+  font-weight: 600;
+}
+
+.mode-switch {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-elev);
+  padding: 4px;
+  border-radius: 10px;
+}
+.mode-switch label {
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+}
+.mode-switch input { position: absolute; opacity: 0; inset: 0; }
+.mode-switch span {
+  display: block;
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text-dim);
+  transition: background 0.15s, color 0.15s;
+}
+.mode-switch input:checked + span {
+  background: #3f3f3f;
+  color: var(--text);
+}
+
+.scene-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.scene-list li {
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: var(--bg-elev);
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.scene-list li:hover { background: #383838; }
+.scene-list li.active {
+  background: #3f3f3f;
+  color: var(--text);
+  outline: 1px solid #5a5a5a;
+}
+.scene-list li.played { color: var(--text-mute); }
+.scene-list li .badge {
+  font-size: 10px;
+  color: var(--text-mute);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.scene-list li.active .badge {
+  color: #ffd966;
+  background: rgba(255, 217, 102, 0.12);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.row > * { flex: 1; min-width: 0; }
+
+.primary-btn, .ghost-btn, .danger-btn {
+  font: inherit;
+  font-size: 13px;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.primary-btn {
+  background: var(--text);
+  color: #1a1a1a;
+  font-weight: 600;
+}
+.primary-btn:disabled { background: #4a4a4a; color: #888; cursor: default; }
+.ghost-btn {
+  background: var(--bg-elev);
+  color: var(--text);
+}
+.ghost-btn:hover { background: #383838; }
+.ghost-btn:disabled { opacity: 0.45; cursor: default; }
+.panel-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
+.danger-btn {
+  background: rgba(240,68,56,0.12);
+  color: #ff8a80;
+  border: 1px solid rgba(240,68,56,0.35);
+}
+.danger-btn:hover { background: rgba(240,68,56,0.2); }
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.toggle input { width: 18px; height: 18px; accent-color: var(--text); }
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+}
+.stats > div {
+  background: var(--bg-elev);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stats .k { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.08em; }
+.stats .v { font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.file-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.file-row input[type=file] {
+  position: absolute;
+  width: 1px; height: 1px; opacity: 0; pointer-events: none;
+}
+.file-btn {
+  background: var(--bg-elev);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 13px;
+  cursor: pointer;
+}
+.file-btn:hover { background: #383838; }
+.file-name {
+  font-size: 11px;
+  color: var(--text-mute);
+  text-align: center;
+  word-break: break-all;
+}
+
+.scrub {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.scrub input[type=range] {
+  width: 100%;
+  accent-color: var(--text);
+}
+.scrub-time {
+  font-size: 11px;
+  color: var(--text-mute);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.replay-scene-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.replay-scene-picker.bd-empty {
+  display: block;
+}
+.replay-scene-option {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elev);
+  color: var(--text-dim);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.replay-scene-option input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--text);
+  margin: 0;
+}
+.replay-scene-option .scene-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.replay-scene-option .scene-name {
+  color: var(--text);
+}
+.replay-scene-option .scene-meta,
+.replay-scene-option .scene-duration {
+  color: var(--text-mute);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.inline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.inline select {
+  background: var(--bg-elev);
+  color: var(--text);
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  font: inherit;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin: 12px 0 0;
+  line-height: 1.4;
+}
+
+/* Session breakdown inspector */
+.bd-empty {
+  font-size: 12px;
+  color: var(--text-mute);
+  background: var(--bg-elev);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+.bd-summary {
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg-elev);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.bd-summary b { color: var(--text); font-variant-numeric: tabular-nums; }
+.bd-scene {
+  background: var(--bg-elev);
+  border-radius: 8px;
+  margin: 6px 0;
+  overflow: hidden;
+}
+.bd-scene > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text);
+  gap: 8px;
+}
+.bd-scene > summary::-webkit-details-marker { display: none; }
+.bd-scene > summary::after {
+  content: "▾";
+  color: var(--text-mute);
+  font-size: 10px;
+  transition: transform 0.15s;
+  margin-left: 6px;
+}
+.bd-scene[open] > summary::after { transform: rotate(180deg); }
+.bd-scene .bd-dur {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.bd-scene .bd-count {
+  color: var(--text-mute);
+  font-size: 11px;
+  margin-left: 6px;
+}
+.bd-msgs {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bd-msg {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.bd-msg.ai { background: rgba(255,255,255,0.04); }
+.bd-msg .bd-t {
+  color: var(--text-mute);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.bd-msg .bd-text {
+  color: var(--text-dim);
+  word-break: break-word;
+}
+.bd-msg.ai .bd-text { color: var(--text); }
+.bd-msg .bd-meta {
+  grid-column: 2;
+  color: var(--text-mute);
+  font-size: 10px;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.bd-role {
+  display: inline-block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 6px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  color: var(--text-mute);
+  vertical-align: 1px;
+}
+.bd-msg.ai .bd-role { background: rgba(120, 200, 255, 0.12); color: #8ec8ff; }
+.bd-msg.user .bd-role { background: rgba(255, 220, 120, 0.12); color: #f6dc8f; }
+
+/* ---------- Scene-complete state ---------- */
+
+/* When the scene has ended naturally, dim the composer slightly so both
+   operator and actor can see the take has wrapped. The hamburger remains
+   accessible for export / next-scene start. */
+body.scene-complete .composer-pill {
+  opacity: 0.55;
+  filter: saturate(0.85);
+}
+body.scene-complete .composer-input::placeholder {
+  color: var(--text-mute);
+}
+body.scene-complete .composer-input:disabled {
+  cursor: default;
+  -webkit-text-fill-color: var(--text);
+  opacity: 1;
+}
+
+/* Operator-facing banner shown only in Assisted mode. */
+body.scene-complete[data-mode="assisted"] #promptStrip,
+body.scene-complete[data-mode="performance"] #promptStrip {
+  display: none !important;
+}
+body.scene-complete::after {
+  content: "scene complete · export & start next from menu";
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--composer-h) + var(--safe-bot) + 12px);
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: var(--text-dim);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none;
+  z-index: 6;
+  white-space: nowrap;
+}
+/* Hide the banner outside Assisted mode — Performance stays clean for filming,
+   and Replay does not need the live-scene affordance. */
+body.scene-complete[data-mode="performance"]::after,
+body.scene-complete[data-mode="replay"]::after { display: none; }
+
+/* ---------- Mode-specific tweaks ---------- */
+
+/* In Replay mode, the prop appearance is preserved; only the prompt strip
+   is hidden, and the menu button auto-hides for clean recording. */
+body[data-mode="replay"] #promptStrip { display: none !important; }
+body[data-mode="replay"] #menuBtn.idle { opacity: 0; pointer-events: none; }
+body[data-mode="replay"] #menuBtn { transition: opacity 0.4s ease; }
+body[data-mode="replay"] #composerInput { pointer-events: none; caret-color: transparent; }
+body[data-mode="replay"] #sendBtn { pointer-events: none; }
+
+/* The optional FAB element from earlier is unused; keep hidden. */
+.replay-fab { display: none !important; }
+
+/* Hide drawer sections per mode */
+body[data-mode="replay"] #livePanel { display: none; }
+body:not([data-mode="replay"]) #replayPanel { display: none; }
+
+/* Desktop polish */
+@media (min-width: 800px) {
+  .msg .bubble { font-size: 16px; }
+  .composer-pill { padding-left: 6px; }
+}
