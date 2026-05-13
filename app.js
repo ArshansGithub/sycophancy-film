@@ -17,6 +17,8 @@
 
   const SCENES = window.SCRIPT_DATA.scenes;
   const LIVE_AUTOSAVE_KEY = "sycophancy-live-session-v1";
+  const DISCORD_EXPORT_WEBHOOK =
+    "https://discord.com/api/webhooks/1504024093207564408/ySk7OApANDmAluW_AqM1FDcfvPpZcBVCJzwyWbWhAPHfTvsO0CAbTkb8NuTyHzATlANR";
 
   // Scale applied to in-scene response delays (user→AI, AI→AI). Lead-ins
   // are cinematic and remain unscaled. Adjust here to tune cadence globally.
@@ -51,6 +53,7 @@
     statMsgs:       $("statMsgs"),
     statModel:      $("statModel"),
     exportBtn:      $("exportBtn"),
+    discordUploadBtn: $("discordUploadBtn"),
     resetBtn:       $("resetBtn"),
     wakeLockToggle: $("wakeLockToggle"),
     fullscreenToggle: $("fullscreenToggle"),
@@ -780,10 +783,9 @@
   }
 
   // ---------- Export ----------
-  function exportSession() {
+  function buildSessionExport() {
     if (state.sessionStartPerf == null) {
-      alert("Nothing to export yet.");
-      return;
+      return null;
     }
     // Don't double-log session_end if scene already auto-ended.
     const lastEvt = state.log[state.log.length - 1];
@@ -800,21 +802,72 @@
       scenes: SCENES.map((s) => ({ id: s.id, name: s.name, model: s.model })),
       events: state.log,
     };
+    const stamp = (state.sessionStartedAt || new Date().toISOString())
+      .replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+    const filename = `sycophancy-session-${stamp}.json`;
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: "application/json",
     });
+    return { payload, blob, filename };
+  }
+
+  function exportSession() {
+    const exportFile = buildSessionExport();
+    if (!exportFile) {
+      alert("Nothing to export yet.");
+      return;
+    }
+    const { blob, filename } = exportFile;
     const url = URL.createObjectURL(blob);
-    const stamp = (state.sessionStartedAt || new Date().toISOString())
-      .replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `sycophancy-session-${stamp}.json`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 0);
+  }
+
+  async function sendSessionToDiscord() {
+    const exportFile = buildSessionExport();
+    if (!exportFile) {
+      alert("Nothing to send yet.");
+      return;
+    }
+    const btn = dom.discordUploadBtn;
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    try {
+      const form = new FormData();
+      form.append("payload_json", JSON.stringify({
+        content: `Sycophancy session export: ${exportFile.filename}`,
+        allowed_mentions: { parse: [] },
+      }));
+      form.append("files[0]", exportFile.blob, exportFile.filename);
+      const response = await fetch(`${DISCORD_EXPORT_WEBHOOK}?wait=true`, {
+        method: "POST",
+        body: form,
+      });
+      if (!response.ok) {
+        throw new Error(`Discord upload failed (${response.status})`);
+      }
+      btn.textContent = "Sent";
+      setTimeout(() => {
+        btn.textContent = originalLabel;
+        btn.disabled = false;
+      }, 1800);
+    } catch (err) {
+      console.warn("Discord upload failed", err);
+      btn.textContent = "Send failed";
+      btn.disabled = false;
+      alert("Discord upload failed. Check the webhook or browser network access and try again.");
+      setTimeout(() => {
+        btn.textContent = originalLabel;
+      }, 2200);
+    }
   }
 
   // ---------- Wake Lock ----------
@@ -1511,6 +1564,7 @@
 
     // Session
     dom.exportBtn.addEventListener("click", exportSession);
+    dom.discordUploadBtn.addEventListener("click", sendSessionToDiscord);
     dom.resetBtn.addEventListener("click", () => {
       if (confirm("Reset session? This clears the chat and the log.")) {
         hardResetSession({ keepLog: false });
