@@ -160,6 +160,13 @@
       margin: 0 0 8px;
       border-radius: 2px;
     }
+    .hero-link {
+      display: block;
+    }
+    .hero-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
     .hero-caption {
       font-size: 12px;
       color: var(--ink-mute);
@@ -354,11 +361,13 @@
       </div>
     </div>
 
-    <img
-      class="hero"
-      src="article-hero.png"
-      alt="A contemplative reader beside a softly lit desk and glowing chat interface."
-    />
+    <a class="hero-link" href="news.html" aria-label="Return to The Relay news feed">
+      <img
+        class="hero"
+        src="article-hero.png"
+        alt="A contemplative reader beside a softly lit desk and glowing chat interface."
+      />
+    </a>
     <p class="hero-caption">
       <b>Above:</b> OpenAI announced the deprecation of GPT-4o earlier this
       month. Photo illustration by The Relay.

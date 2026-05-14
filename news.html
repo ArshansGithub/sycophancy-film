@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>The Relay — Top Stories</title>
+  <style>
+    :root {
+      --bg:        #ffffff;
+      --surface:   #fafaf9;
+      --line:      #e6e6e3;
+      --line-soft: #efefec;
+      --ink:       #111111;
+      --ink-2:     #2b2b2b;
+      --ink-3:     #555555;
+      --ink-mute:  #8a8a87;
+      --accent:    #d23434;
+      --tag:       #6a6a66;
+      --safe-top:  env(safe-area-inset-top, 0px);
+      --safe-bot:  env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--ink-2);
+    }
+    a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0.04); }
+
+    /* ---------- Masthead ---------- */
+    .masthead {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      padding: calc(var(--safe-top) + 10px) 16px 0;
+    }
+    .masthead-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+    }
+    .brand { display: inline-flex; align-items: baseline; gap: 6px; }
+    .brand-mark {
+      width: 18px; height: 18px;
+      background: var(--accent);
+      display: inline-block;
+      border-radius: 3px;
+      transform: translateY(2px);
+    }
+    .brand-name { font-weight: 800; letter-spacing: -0.01em; font-size: 17px; color: var(--ink); }
+    .brand-tag {
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink-mute); padding-left: 4px;
+    }
+    .masthead .right {
+      display: inline-flex; gap: 14px; align-items: center;
+      font-size: 12px; color: var(--ink-mute);
+    }
+    .icon-btn {
+      width: 28px; height: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 999px;
+    }
+    .icon-btn svg { width: 18px; height: 18px; stroke: var(--ink-3); fill: none; stroke-width: 2; }
+
+    /* Section nav */
+    .nav {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding: 4px 0 10px;
+      scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-mute);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+    }
+    .nav a.on {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ---------- Feed ---------- */
+    main { max-width: 720px; margin: 0 auto; padding: 8px 16px calc(var(--safe-bot) + 40px); }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin: 14px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* Lead card */
+    .lead {
+      display: block;
+      margin: 0 0 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lead .thumb {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 12px;
+    }
+    .lead .kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .lead h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 800;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: 0 0 8px;
+    }
+    .lead .dek {
+      font-size: 14px;
+      color: var(--ink-3);
+      margin: 0 0 8px;
+      line-height: 1.45;
+    }
+    .lead .meta, .row-meta {
+      font-size: 11px;
+      color: var(--ink-mute);
+      letter-spacing: 0.02em;
+    }
+    .lead .meta .dot, .row-meta .dot { margin: 0 6px; opacity: 0.5; }
+
+    /* List rows */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 92px;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line-soft);
+      align-items: flex-start;
+    }
+    .row:last-child { border-bottom: none; }
+    .row .text .kicker {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 4px;
+    }
+    .row .text .kicker.tech     { color: #2b6cb0; }
+    .row .text .kicker.business { color: #2f855a; }
+    .row .text .kicker.culture  { color: #b7791f; }
+    .row .text .kicker.opinion  { color: #6b46c1; }
+    .row .text .kicker.politics { color: var(--accent); }
+    .row h3 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.25;
+      color: var(--ink);
+      margin: 0 0 6px;
+      letter-spacing: -0.005em;
+    }
+    .row .thumb {
+      width: 92px;
+      height: 70px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      display: block;
+      object-fit: cover;
+      background: var(--surface);
+    }
+
+    /* Placeholder thumbnails — abstract gradients */
+    .ph {
+      background: linear-gradient(135deg, #e9e7e0 0%, #cfd6d2 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .ph.ph-tech     { background: linear-gradient(135deg, #d6e2f0 0%, #aabfd6 100%); }
+    .ph.ph-business { background: linear-gradient(135deg, #d8e8da 0%, #a8c7af 100%); }
+    .ph.ph-culture  { background: linear-gradient(135deg, #f0e3c8 0%, #d7bb86 100%); }
+    .ph.ph-opinion  { background: linear-gradient(135deg, #e2d6f0 0%, #b9a1d6 100%); }
+    .ph.ph-politics { background: linear-gradient(135deg, #f0d6d6 0%, #c89090 100%); }
+    .ph.ph-world    { background: linear-gradient(135deg, #d0d8e0 0%, #97a8b8 100%); }
+
+    .ph::before, .ph::after {
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,0.18);
+      border-radius: 50%;
+    }
+    .ph::before { width: 60%; height: 60%; top: -20%; right: -10%; }
+    .ph::after  { width: 35%; height: 35%; bottom: -10%; left: 10%; background: rgba(0,0,0,0.06); }
+
+    /* Lead hero — themed bg if no image */
+    .lead .thumb.ph-feature {
+      background: linear-gradient(135deg, #2b2f3a 0%, #3b4452 60%, #5a6573 100%);
+      position: relative;
+    }
+    .lead .thumb.ph-feature::after {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 70% 30%, rgba(210,52,52,0.35), transparent 45%),
+        radial-gradient(circle at 25% 75%, rgba(255,255,255,0.10), transparent 50%);
+    }
+
+    /* Footer */
+    footer.foot {
+      padding: 22px 18px calc(var(--safe-bot) + 28px);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 11px;
+      color: var(--ink-mute);
+      letter-spacing: 0.06em;
+    }
+    footer.foot .brand-name { color: var(--ink-3); font-size: 12px; }
+
+    /* Make tappable rows feel like buttons on press */
+    a.lead:active, a.row:active { background: var(--surface); }
+  </style>
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="masthead-row">
+      <a href="news.html" class="brand" aria-label="The Relay home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">The Relay</span>
+        <span class="brand-tag">Top Stories</span>
+      </a>
+      <div class="right">
+        <span>Fri, Nov 14</span>
+        <span class="icon-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Sections">
+      <a href="#" class="on">For You</a>
+      <a href="#">Tech</a>
+      <a href="#">Business</a>
+      <a href="#">Politics</a>
+      <a href="#">Culture</a>
+      <a href="#">Opinion</a>
+      <a href="#">World</a>
+      <a href="#">Science</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <div class="section-label">Top stories</div>
+
+    <!-- LEAD ARTICLE — the only one that opens the real article -->
+    <a class="lead" href="article.html">
+      <img
+        class="thumb"
+        src="article-hero.png"
+        alt="A contemplative reader beside a softly lit desk and glowing chat interface."
+      />
+      <div class="kicker">Artificial Intelligence</div>
+      <h2>OpenAI Quietly Retires GPT-4o, and the Internet Is Grieving</h2>
+      <p class="dek">
+        The company says its new flagship is smarter, safer, and more cautious.
+        For millions of users who treated the older model like a friend, the
+        change has not gone over quietly.
+      </p>
+      <div class="meta">
+        Jordan Vasquez <span class="dot">·</span> 7 min read <span class="dot">·</span> 2h ago
+      </div>
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker tech">Tech</div>
+        <h3>Inside the Frantic Week That Followed OpenAI's GPT-5 Rollout</h3>
+        <div class="row-meta">Priya Anand <span class="dot">·</span> 4h ago</div>
+      </div>
+      <img class="thumb" src="news-rollout.png" alt="Late-night laptop dashboards during a tense AI rollout." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker business">Business</div>
+        <h3>AI Companion Startups See Spike in Sign-Ups After 4o Sunset</h3>
+        <div class="row-meta">Marco Bellini <span class="dot">·</span> 5h ago</div>
+      </div>
+      <img class="thumb" src="news-startups.png" alt="Startup team studying sign-up metrics around a glass table." />
+    </a>
+
+    <div class="section-label">More to read</div>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker opinion">Opinion</div>
+        <h3>We Were Never Supposed to Love the Chatbot. So Why Do We?</h3>
+        <div class="row-meta">Hana Okafor <span class="dot">·</span> 6h ago</div>
+      </div>
+      <img class="thumb" src="news-attachment.png" alt="A solitary person lit by a phone in a quiet apartment." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker politics">Politics</div>
+        <h3>Senate Panel Sets Hearing on AI Mental-Health Risks for December</h3>
+        <div class="row-meta">Erin Halverson <span class="dot">·</span> 7h ago</div>
+      </div>
+      <img class="thumb" src="news-hearing.png" alt="Lawmakers seated at microphones in a hearing room." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker culture">Culture</div>
+        <h3>"i miss 4o": The Subreddit That Became a Group Eulogy</h3>
+        <div class="row-meta">Sasha Knowles <span class="dot">·</span> 8h ago</div>
+      </div>
+      <img class="thumb" src="news-community.png" alt="Anonymous online posts glowing above a dim desk." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker tech">Tech</div>
+        <h3>What GPT-5 Won't Talk About — And Why That's a Feature</h3>
+        <div class="row-meta">Devon Park <span class="dot">·</span> 10h ago</div>
+      </div>
+      <img class="thumb" src="news-safety.png" alt="A muted laptop interface with a caution symbol in soft daylight." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker world">World</div>
+        <h3>EU Regulators Push for Disclosure Rules on "Companion" AI Models</h3>
+        <div class="row-meta">Tomás Reyes <span class="dot">·</span> 12h ago</div>
+      </div>
+      <img class="thumb" src="news-eu.png" alt="A government corridor lined with European flags." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker business">Business</div>
+        <h3>OpenAI Shares Slip in Premarket Trading on Sentiment Backlash</h3>
+        <div class="row-meta">Marco Bellini <span class="dot">·</span> 13h ago</div>
+      </div>
+      <img class="thumb" src="news-markets.png" alt="A trader watching market charts across multiple monitors." />
+    </a>
+
+    <a class="row" href="#" onclick="return false;">
+      <div class="text">
+        <div class="kicker opinion">Opinion</div>
+        <h3>Sycophancy Was the Product. We Just Didn't Want to Hear It.</h3>
+        <div class="row-meta">Hana Okafor <span class="dot">·</span> 14h ago</div>
+      </div>
+      <img class="thumb" src="news-sycophancy.png" alt="A phone and laptop reflecting chat bubbles in a dark room." />
+    </a>
+
+  </main>
+
+  <footer class="foot">
+    <div class="brand-name">The Relay</div>
+    <div>© 2025 The Relay Media · All rights reserved</div>
+  </footer>
+
+</body>
+</html>
