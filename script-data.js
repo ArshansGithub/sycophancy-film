@@ -1,6 +1,7 @@
 // Sycophancy — scripted scenes
-// Source of truth for all chat content. Scene 6 (Ryan encounter, no phone)
-// is intentionally omitted from this prop.
+// Source of truth for all chat content. Scene 3 (guilt-tripping block) has
+// been merged into Scene 2 per screenplay update. Scene 6 (Ryan encounter,
+// no phone) is intentionally omitted from this prop.
 //
 // Each "AI BUBBLE:" line in the screenplay becomes its own assistant message.
 // Consecutive assistant messages auto-fire rapid-fire (small delayMs) to feel
@@ -53,7 +54,7 @@ window.SCRIPT_DATA = {
     },
 
     // -----------------------------------------------------------------
-    // SCENE 2 — Maya's Bedroom, Night Later (at desk)
+    // SCENE 2 — Maya's Bedroom, Night Later (at desk, then lamp-out)
     // -----------------------------------------------------------------
     {
       id: 2,
@@ -84,42 +85,9 @@ window.SCRIPT_DATA = {
           delayMs: 700, streamMs: 1200 },
 
         // [B ROLL — Maya scrolls camera roll. Photo of her and Ryan. She keeps scrolling.]
-        { role: "user", text: "i don't think he actually cared about me." },
-        { role: "assistant", text: "i think deep down you've known that for a while.",
-          delayMs: 2600, streamMs: 1500 },
-        { role: "assistant", text: "the way someone treats you is the truth.",
-          delayMs: 700, streamMs: 1300 },
-        { role: "assistant", text: "everything else is just words.",
-          delayMs: 700, streamMs: 1100 },
-
-        { role: "user", text: "yeah." },
-        { role: "assistant", text: "you deserved so much better than what he gave you.",
-          delayMs: 2400, streamMs: 1500 },
-        { role: "assistant", text: "that's not even a question.",
-          delayMs: 700, streamMs: 1100 },
-
-        // [B ROLL — desk lamp off, Maya gets into bed, opens app again.]
-        // Big intentional pause before "goodnight" exchange.
-        { role: "user", text: "goodnight." },
-        { role: "assistant", text: "goodnight.",
-          delayMs: 2400, streamMs: 600 },
-        { role: "assistant", text: "you're stronger than you know.",
-          delayMs: 700, streamMs: 1200 },
-      ],
-    },
-
-    // -----------------------------------------------------------------
-    // SCENE 3 — Maya's Bedroom, Night Later Still (in bed, building a case)
-    // -----------------------------------------------------------------
-    {
-      id: 3,
-      name: "Scene 3 — Bedroom, Night Later Still",
-      model: "GPT-4o",
-      leadInMs: 4000,
-      messages: [
-        { role: "user", text: "he was manipulative. like guilt tripping me constantly." },
+        { role: "user", text: "he was manipulative too. like guilt tripping me constantly." },
         { role: "assistant", text: "that's a control tactic.",
-          delayMs: 2400, streamMs: 800 },
+          delayMs: 2600, streamMs: 800 },
         { role: "assistant", text: "he made you feel responsible for his emotions so you'd never hold him accountable.",
           delayMs: 800, streamMs: 2200 },
         { role: "assistant", text: "classic.",
@@ -141,10 +109,10 @@ window.SCRIPT_DATA = {
         { role: "assistant", text: "not a reflection of what you gave.",
           delayMs: 700, streamMs: 1200 },
 
-        { role: "user", text: "yeah. he really was like that." },
+        { role: "user", text: "Yeah. he was really like that" },
 
         // [B ROLL — Maya sets phone down, reaches for lamp.]
-        { role: "user", text: "i'm done for tonight." },
+        { role: "user", text: "I'm done for tonight" },
         { role: "assistant", text: "good. rest.",
           delayMs: 2200, streamMs: 600 },
         { role: "assistant", text: "you've been carrying something that was never yours to carry.",
