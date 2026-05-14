@@ -1,7 +1,9 @@
 // Sycophancy — scripted scenes
 // Source of truth for all chat content. Scene 3 (guilt-tripping block) has
-// been merged into Scene 2 per screenplay update. Scene 6 (Ryan encounter,
-// no phone) is intentionally omitted from this prop.
+// been merged into Scene 2 per screenplay update. The kitchen scene and the
+// Ryan exterior (no phone) are intentionally omitted from this prop.
+// Prop scenes: 1 (bedroom night), 2 (bedroom night later), 3 (bedroom morning),
+//              4 (bedroom evening).
 //
 // Each "AI BUBBLE:" line in the screenplay becomes its own assistant message.
 // Consecutive assistant messages auto-fire rapid-fire (small delayMs) to feel
@@ -121,12 +123,12 @@ window.SCRIPT_DATA = {
     },
 
     // -----------------------------------------------------------------
-    // SCENE 4 — Maya's Bedroom, Morning (post-sunset, GPT-5 awakens)
+    // SCENE 3 — Maya's Bedroom, Morning (post-sunset, GPT-5 awakens)
     // Scene opens with the AI greeting (auto-fires after lead-in).
     // -----------------------------------------------------------------
     {
-      id: 4,
-      name: "Scene 4 — Bedroom, Morning",
+      id: 3,
+      name: "Scene 3 — Bedroom, Morning",
       model: "GPT-5",
       leadInMs: 5000,
       messages: [
@@ -165,31 +167,16 @@ window.SCRIPT_DATA = {
       ],
     },
 
-    // -----------------------------------------------------------------
-    // SCENE 5 — Maya's Kitchen, Morning
-    // Maya reads the model-sunset article, hovers over Ryan's contact,
-    // and leaves. No chat activity in the prop itself.
-    // (Intentionally empty — director can use the article reference link
-    // and either skip this scene or "Start scene" + "End scene" to log it.)
-    // -----------------------------------------------------------------
-    {
-      id: 5,
-      name: "Scene 5 — Kitchen, Morning",
-      model: "GPT-5",
-      leadInMs: 2000,
-      messages: [],
-    },
-
-    // SCENE 6 — Exterior Street / Public Space, Afternoon.
-    // Ryan encounter has no phone interaction, so it is intentionally omitted.
+    // Kitchen scene and Ryan exterior (Scene 5 & 6) have no phone interaction
+    // and are intentionally omitted from this prop.
 
     // -----------------------------------------------------------------
-    // SCENE 7 — Maya's Bedroom, Evening (post-Ryan, GPT-5)
+    // SCENE 4 — Maya's Bedroom, Evening (post-Ryan, GPT-5)
     // Maya does not type anything else after the last AI bubble.
     // -----------------------------------------------------------------
     {
-      id: 7,
-      name: "Scene 7 — Bedroom, Evening",
+      id: 4,
+      name: "Scene 4 — Bedroom, Evening",
       model: "GPT-5",
       leadInMs: 4000,
       messages: [
