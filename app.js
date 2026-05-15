@@ -24,6 +24,9 @@
   // are cinematic and remain unscaled. Adjust here to tune cadence globally.
   const RESPONSE_DELAY_SCALE = 1 / 3;
   const MIN_RESPONSE_DELAY_MS = 150;
+  const AI_TYPING_DURATION_SCALE = 0.8; // 25% faster typing speed.
+  const MIN_TYPING_INDICATOR_MS = 680;
+  const MIN_STREAM_MS = 320;
 
   // ---------- DOM ----------
   const $ = (id) => document.getElementById(id);
@@ -169,9 +172,10 @@
       console.warn("Autosave clear failed", err);
     }
   }
-  function restoreChatFromLog(log) {
+  function restoreChatFromLog(log, sceneId = null) {
     clearChat();
     log.forEach((event) => {
+      if (sceneId != null && event.sceneId !== sceneId) return;
       if (event.type === "user_message") {
         appendUserMessage(event.text || "");
       } else if (event.type === "ai_message_done") {
@@ -212,7 +216,8 @@
     state.aiTurnInFlight = false;
     state.aiTurnAbort = null;
     if (!state.elapsedTimer) state.elapsedTimer = setInterval(updateElapsed, 250);
-    restoreChatFromLog(state.log);
+    const sc = currentScene();
+    restoreChatFromLog(state.log, sc ? sc.id : null);
     dom.composerInput.value = snapshot.composerValue || "";
     state.inputLastValue = snapshot.inputLastValue || dom.composerInput.value;
     autosizeComposer();
@@ -228,7 +233,6 @@
     updateStartSceneBtn();
     updatePromptStrip();
     updateElapsed();
-    const sc = currentScene();
     if (!state.sceneComplete && sc && sc.messages[state.msgIdx] && sc.messages[state.msgIdx].role === "assistant") {
       scheduleAITurn(MIN_RESPONSE_DELAY_MS, /*fromSceneStart=*/false);
     }
@@ -463,45 +467,38 @@
     dom.promptStrip.hidden = false;
   }
 
-  // Each scene = its own session. Calling startScene clears the current
-  // session and starts a fresh one for the selected scene. If the current
-  // session has any content, ask before discarding.
+  // Each scene gets a clean visible chat, while the filming session keeps
+  // accumulating events so export/replay can include every completed scene.
   function startScene() {
     let sc = currentScene();
     if (!sc) return;
     if (state.aiTurnInFlight) return;
 
-    // Confirm before discarding an unexported session
+    // Confirm before abandoning the current in-progress scene.
     const hasContent = liveSessionHasContent();
     if (hasContent && !state.sceneComplete) {
       const ok = confirm(
-        "Starting this scene will clear the current session.\n" +
-        "Export the JSON first if you want to keep it.\n\n" +
+        "Starting this scene will clear the current scene's visible chat.\n" +
+        "Completed scenes and the session log will stay saved.\n\n" +
         "Continue?"
       );
       if (!ok) return;
     }
 
-    // Hard reset of the live session, but preserve which scene is selected
+    // Reset only the active scene surface. Do not clear the overall session
+    // log, played scene list, or per-scene runtimes.
     if (state.aiTurnAbort) state.aiTurnAbort.cancelled = true;
     state.aiTurnInFlight = false;
     state.sceneComplete = false;
     state.scenePickedFromList = false;
-    state.log = [];
-    state.sessionStartPerf = null;
-    state.sessionStartedAt = null;
-    if (state.elapsedTimer) { clearInterval(state.elapsedTimer); state.elapsedTimer = null; }
-    state.sceneStartsPlayed.clear();
-    state.sceneRunTimes = {};
     state.sceneStartTime = null;
     state.msgIdx = 0;
     clearChat();
     clearComposer();
     setComposerLocked(false);
     document.body.classList.remove("scene-complete");
-    dom.statElapsed.textContent = "0:00";
 
-    // Begin the new session
+    // Begin the new scene inside the current session.
     state.sceneStartsPlayed.add(sc.id);
     setModel(sc.model);
     initSession();
@@ -517,7 +514,7 @@
     scheduleAITurn(sc.leadInMs || 0, /*fromSceneStart=*/true);
   }
 
-  // Manually end the current scene (Director button). Logs scene_end + session_end.
+  // Manually end the current scene (Director button).
   function endScene() {
     const sc = currentScene();
     if (!sc) return;
@@ -529,7 +526,6 @@
         state.sceneRunTimes[sc.id] = performance.now() - state.sceneStartTime;
       }
       logEvent("scene_end", { sceneId: sc.id, manual: true });
-      logEvent("session_end", { manual: true });
     }
     state.sceneComplete = true;
     setComposerLocked(true, /*forStreaming=*/false);
@@ -548,12 +544,11 @@
     const sc = currentScene();
     if (!sc) return;
     if (state.msgIdx >= sc.messages.length) {
-      // Scene complete — auto end the session.
+      // Scene complete.
       if (state.sceneStartTime !== null) {
         state.sceneRunTimes[sc.id] = performance.now() - state.sceneStartTime;
       }
       logEvent("scene_end", { sceneId: sc.id });
-      logEvent("session_end", {});
       state.aiTurnInFlight = false;
       state.sceneComplete = true;
       setComposerLocked(true, /*forStreaming=*/false);
@@ -603,8 +598,12 @@
       : Math.max(MIN_RESPONSE_DELAY_MS, Math.floor(delayMs * RESPONSE_DELAY_SCALE));
 
     // Typing indicator: short visible beat before streaming starts.
-    const typingMs = Math.max(850, Math.min(1200, Math.floor((m.streamMs || 1200) * 0.45)));
-    const streamMs = Math.max(400, m.streamMs || 1400);
+    const baseStreamMs = m.streamMs || 1400;
+    const typingMs = Math.max(
+      MIN_TYPING_INDICATOR_MS,
+      Math.min(960, Math.floor(baseStreamMs * 0.45 * AI_TYPING_DURATION_SCALE))
+    );
+    const streamMs = Math.max(MIN_STREAM_MS, Math.floor(baseStreamMs * AI_TYPING_DURATION_SCALE));
 
     const tStart = nowT();
     const myMsgIdx = state.msgIdx;
@@ -787,10 +786,10 @@
     if (state.sessionStartPerf == null) {
       return null;
     }
-    // Don't double-log session_end if scene already auto-ended.
-    const lastEvt = state.log[state.log.length - 1];
+    const events = state.log.slice();
+    const lastEvt = events[events.length - 1];
     if (!lastEvt || lastEvt.type !== "session_end") {
-      logEvent("session_end", { exported: true });
+      events.push({ t: nowT(), type: "session_end", exported: true });
     }
     const payload = {
       version: 1,
@@ -800,7 +799,7 @@
       durationMs: nowT(),
       ua: navigator.userAgent,
       scenes: SCENES.map((s) => ({ id: s.id, name: s.name, model: s.model })),
-      events: state.log,
+      events,
     };
     const stamp = (state.sessionStartedAt || new Date().toISOString())
       .replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
