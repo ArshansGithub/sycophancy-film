@@ -75,6 +75,10 @@
     replayScenePicker: $("replayScenePicker"),
     rFullscreenToggle: $("rFullscreenToggle"),
     replayBreakdown: $("replayBreakdown"),
+    replayEditStatus: $("replayEditStatus"),
+    replayApplyEdits: $("replayApplyEdits"),
+    replayResetEdits: $("replayResetEdits"),
+    replayExportEdits: $("replayExportEdits"),
   };
 
   // ---------- State ----------
@@ -925,6 +929,7 @@
     const scenes = [];
     let cur = null;
     let aiTurn = null;
+    let pendingSend = null;
     const lastT = events.length ? events[events.length - 1].t : 0;
     for (let i = 0; i < events.length; i += 1) {
       const e = events[i];
@@ -945,8 +950,25 @@
         case "scene_end":
           if (cur) cur.endT = e.t;
           break;
+        case "send":
+          pendingSend = {
+            t: e.t,
+            text: e.text || "",
+            scripted: e.scripted || "",
+            msgIdx: e.msgIdx,
+          };
+          break;
         case "user_message":
-          if (cur) cur.messages.push({ kind: "user", t: e.t, text: e.text || "" });
+          if (cur) {
+            cur.messages.push({
+              kind: "user",
+              t: e.t,
+              text: e.text || "",
+              scripted: pendingSend ? pendingSend.scripted : "",
+              editKey: e._editKey || "",
+            });
+          }
+          pendingSend = null;
           break;
         case "typing_start":
           aiTurn = { typingStartT: e.t, streamStartT: null };
@@ -989,6 +1011,9 @@
     s = String(s || "");
     return s.length > n ? s.slice(0, n - 1) + "…" : s;
   }
+  function plural(n, singular, pluralForm = singular + "s") {
+    return `${n} ${n === 1 ? singular : pluralForm}`;
+  }
 
   function renderBreakdown(scenes, totalMs) {
     const el = dom.replayBreakdown;
@@ -1027,9 +1052,18 @@
         if (m.kind === "user") {
           const offset = m.t - s.startT;
           const sinceLast = m.t - prevT;
+          const editKey = escapeHtml(m.editKey || "");
+          const rows = Math.max(2, Math.min(5, Math.ceil(String(m.text || "").length / 32)));
+          const scriptedDiffers = m.scripted && m.scripted !== m.text;
           html += `<li class="bd-msg user">`;
           html += `<span class="bd-t">${formatClock(offset, false)}</span>`;
-          html += `<span class="bd-text"><span class="bd-role">user</span>${escapeHtml(truncate(m.text, 80))}</span>`;
+          html += `<span class="bd-text bd-edit-text"><span class="bd-role">actor</span>`;
+          html += `<textarea class="bd-edit-input" data-edit-key="${editKey}" rows="${rows}" spellcheck="true" aria-label="Edit actor message">${escapeHtml(m.text)}</textarea>`;
+          if (scriptedDiffers) {
+            html += `<span class="bd-scripted"><span class="bd-role">script</span>${escapeHtml(m.scripted)}</span>`;
+            html += `<button type="button" class="bd-script-btn" data-use-scripted="${editKey}" data-scripted="${escapeHtml(m.scripted)}">Use scripted</button>`;
+          }
+          html += `</span>`;
           html += `<span class="bd-meta">since prev ${fmtSec(sinceLast)}</span>`;
           html += `</li>`;
           prevT = m.t;
@@ -1041,7 +1075,7 @@
           const totalAi = m.doneT - m.t;
           html += `<li class="bd-msg ai">`;
           html += `<span class="bd-t">${formatClock(offset, false)}</span>`;
-          html += `<span class="bd-text"><span class="bd-role">ai</span>${escapeHtml(truncate(m.text, 80))}</span>`;
+          html += `<span class="bd-text"><span class="bd-role">ai</span><span class="bd-readonly-text">${escapeHtml(m.text)}</span></span>`;
           html += `<span class="bd-meta">delay ${fmtSec(delay)} · typing ${fmtSec(typingDur)} · stream ${fmtSec(streamDur)} · total ${fmtSec(totalAi)}</span>`;
           html += `</li>`;
           prevT = m.doneT;
@@ -1056,9 +1090,11 @@
   const Replay = (() => {
     const r = {
       data: null,
+      fileName: "",
       durationMs: 0,
       events: [],
       sourceEvents: [],
+      originalEvents: [],
       scenes: [],
       selectedSceneKeys: new Set(),
       // Playback
@@ -1077,6 +1113,235 @@
       lastUserMessageEl: null,
     };
 
+    function cloneReplayEvent(event) {
+      return { ...(event || {}) };
+    }
+
+    function annotateReplayEvents(events) {
+      let sceneSerial = 0;
+      let userSerial = 0;
+      let sceneKey = "";
+      events.forEach((event) => {
+        delete event._sceneKey;
+        delete event._editKey;
+        if (event.type === "scene_start") {
+          sceneSerial += 1;
+          userSerial = 0;
+          sceneKey = `${event.sceneId || "scene"}-${sceneSerial}`;
+          event._sceneKey = sceneKey;
+          return;
+        }
+        if (sceneKey) event._sceneKey = sceneKey;
+        if (event.type === "user_message") {
+          userSerial += 1;
+          event._editKey = `${sceneKey || "session"}-user-${userSerial}`;
+        }
+      });
+    }
+
+    function compareTurnEvents(a, b) {
+      const priority = {
+        composer_focus: 0,
+        keydown: 1,
+        input: 2,
+        send: 3,
+        composer_blur: 4,
+      };
+      const pa = priority[a.type] == null ? 2 : priority[a.type];
+      const pb = priority[b.type] == null ? 2 : priority[b.type];
+      return (a.t - b.t) || (pa - pb);
+    }
+
+    function buildSyntheticTypingEvents(text, startT, endT, userMessageT) {
+      const chars = Array.from(String(text || ""));
+      const latestInputT = Math.max(0, userMessageT - 1);
+      const start = Math.max(0, Math.min(Math.round(startT), latestInputT));
+      const end = Math.max(start, Math.min(Math.round(endT), latestInputT));
+      if (!chars.length) {
+        return [{ t: end, type: "input", value: "" }];
+      }
+      const span = Math.max(0, end - start);
+      const events = [];
+      chars.forEach((char, idx) => {
+        const progress = chars.length === 1 ? 1 : idx / (chars.length - 1);
+        const t = Math.round(start + span * progress);
+        const value = chars.slice(0, idx + 1).join("");
+        events.push({ t, type: "keydown", key: char === "\n" ? "Enter" : char });
+        events.push({ t, type: "input", value });
+      });
+      return events;
+    }
+
+    function findLastTurnEvent(turnEvents, type) {
+      for (let i = turnEvents.length - 1; i >= 0; i -= 1) {
+        if (turnEvents[i].type === type) return turnEvents[i];
+      }
+      return null;
+    }
+
+    function replaceReplayUserTurnText(editKey, newText) {
+      const userIdx = r.sourceEvents.findIndex((event) =>
+        event.type === "user_message" && event._editKey === editKey
+      );
+      if (userIdx < 0) return false;
+
+      const oldUserEvent = r.sourceEvents[userIdx];
+      const oldText = oldUserEvent.text || "";
+      const text = String(newText || "");
+      if (text === oldText) return false;
+
+      let boundaryIdx = -1;
+      for (let i = userIdx - 1; i >= 0; i -= 1) {
+        const type = r.sourceEvents[i].type;
+        if (type === "scene_start" || type === "user_message" || type === "ai_message_done") {
+          boundaryIdx = i;
+          break;
+        }
+      }
+
+      const before = r.sourceEvents.slice(0, boundaryIdx + 1);
+      const turnEvents = r.sourceEvents.slice(boundaryIdx + 1, userIdx);
+      const after = r.sourceEvents.slice(userIdx + 1);
+      const inputEvents = turnEvents.filter((event) => event.type === "input");
+      const boundaryT = boundaryIdx >= 0 ? r.sourceEvents[boundaryIdx].t : 0;
+      const sendEvent = findLastTurnEvent(turnEvents, "send");
+      const sendT = sendEvent ? sendEvent.t : oldUserEvent.t;
+
+      let firstInputT = inputEvents.length ? inputEvents[0].t : null;
+      let lastInputT = inputEvents.length ? inputEvents[inputEvents.length - 1].t : null;
+      if (firstInputT == null || lastInputT == null) {
+        const estimatedTypingMs = Math.max(450, Math.min(4000, Array.from(text).length * 85));
+        firstInputT = Math.max(boundaryT, sendT - estimatedTypingMs);
+        lastInputT = Math.max(firstInputT, sendT - 1);
+      }
+
+      const syntheticTyping = buildSyntheticTypingEvents(text, firstInputT, lastInputT, oldUserEvent.t);
+      const keptTurnEvents = turnEvents
+        .filter((event) => event.type !== "input" && event.type !== "keydown")
+        .map((event) => {
+          if (event.type !== "send") return event;
+          const next = { ...event, text };
+          if (!next.scripted || next.scripted === oldText) next.scripted = text;
+          return next;
+        });
+      const updatedUserEvent = { ...oldUserEvent, text };
+      r.sourceEvents = [
+        ...before,
+        ...keptTurnEvents.concat(syntheticTyping).sort(compareTurnEvents),
+        updatedUserEvent,
+        ...after,
+      ];
+      return true;
+    }
+
+    function rebuildAfterSourceEventsChange() {
+      const selected = new Set(r.selectedSceneKeys);
+      annotateReplayEvents(r.sourceEvents);
+      r.scenes = buildReplayScenes(r.sourceEvents);
+      r.selectedSceneKeys = new Set(
+        r.scenes
+          .filter((scene) => selected.has(scene.key))
+          .map((scene) => scene.key)
+      );
+      if (!r.selectedSceneKeys.size) {
+        r.selectedSceneKeys = new Set(r.scenes.map((scene) => scene.key));
+      }
+      renderReplayScenePicker();
+      applyReplaySceneSelection();
+    }
+
+    function getUserText(editKey) {
+      const event = r.sourceEvents.find((item) =>
+        item.type === "user_message" && item._editKey === editKey
+      );
+      return event ? (event.text || "") : "";
+    }
+
+    function userTextMap(events) {
+      const map = new Map();
+      events.forEach((event) => {
+        if (event.type === "user_message" && event._editKey) {
+          map.set(event._editKey, event.text || "");
+        }
+      });
+      return map;
+    }
+
+    function getEditedCount() {
+      const original = userTextMap(r.originalEvents);
+      let count = 0;
+      r.sourceEvents.forEach((event) => {
+        if (
+          event.type === "user_message" &&
+          event._editKey &&
+          original.has(event._editKey) &&
+          (event.text || "") !== original.get(event._editKey)
+        ) {
+          count += 1;
+        }
+      });
+      return count;
+    }
+
+    function applyTextEdits(edits) {
+      let changed = 0;
+      edits.forEach((text, editKey) => {
+        if (replaceReplayUserTurnText(editKey, text)) changed += 1;
+      });
+      if (changed) rebuildAfterSourceEventsChange();
+      return changed;
+    }
+
+    function resetEdits() {
+      if (!r.originalEvents.length) return;
+      const selected = new Set(r.selectedSceneKeys);
+      r.sourceEvents = r.originalEvents.map(cloneReplayEvent);
+      annotateReplayEvents(r.sourceEvents);
+      r.scenes = buildReplayScenes(r.sourceEvents);
+      r.selectedSceneKeys = new Set(
+        r.scenes
+          .filter((scene) => selected.has(scene.key))
+          .map((scene) => scene.key)
+      );
+      if (!r.selectedSceneKeys.size) {
+        r.selectedSceneKeys = new Set(r.scenes.map((scene) => scene.key));
+      }
+      renderReplayScenePicker();
+      applyReplaySceneSelection();
+    }
+
+    function cleanReplayEvent(event) {
+      const clean = {};
+      Object.keys(event).forEach((key) => {
+        if (!key.startsWith("_")) clean[key] = event[key];
+      });
+      return clean;
+    }
+
+    function exportEditedSession() {
+      if (!r.data) return;
+      const events = r.sourceEvents.map(cleanReplayEvent);
+      const durationMs = events.reduce((max, event) => Math.max(max, event.t || 0), 0);
+      const payload = {
+        ...r.data,
+        editedAt: new Date().toISOString(),
+        durationMs,
+        events,
+      };
+      const baseName = (r.fileName || "sycophancy-session.json").replace(/\.json$/i, "");
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${baseName}-edited.json`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
+    }
+
     function reset() {
       stop();
       r.virtualTime = 0;
@@ -1092,9 +1357,25 @@
       updateScrubUI();
     }
 
-    function load(data) {
+    function clearLoaded() {
+      stop();
+      r.data = null;
+      r.fileName = "";
+      r.durationMs = 0;
+      r.events = [];
+      r.sourceEvents = [];
+      r.originalEvents = [];
+      r.scenes = [];
+      r.selectedSceneKeys.clear();
+    }
+
+    function load(data, fileName = "") {
       r.data = data;
-      r.sourceEvents = (data.events || []).slice().sort((a, b) => a.t - b.t);
+      r.fileName = fileName;
+      const events = (data.events || []).map(cloneReplayEvent).sort((a, b) => a.t - b.t);
+      annotateReplayEvents(events);
+      r.originalEvents = events.map(cloneReplayEvent);
+      r.sourceEvents = events.map(cloneReplayEvent);
       r.scenes = buildReplayScenes(r.sourceEvents);
       r.selectedSceneKeys = new Set(r.scenes.map((scene) => scene.key));
       renderReplayScenePicker();
@@ -1119,6 +1400,7 @@
       dom.rStopBtn.disabled = !r.events.length;
       dom.rRestartBtn.disabled = !r.events.length;
       renderBreakdown(buildBreakdown(r.events), r.durationMs);
+      updateReplayEditControls();
     }
 
     function rebuildSceneJump() {
@@ -1341,6 +1623,12 @@
     return {
       load, play, pause, stop, restart, setSpeed, seek, reset, getState,
       toggleSceneSelection,
+      applyTextEdits,
+      resetEdits,
+      exportEditedSession,
+      getUserText,
+      getEditedCount,
+      clearLoaded,
     };
   })();
 
@@ -1404,9 +1692,10 @@
       return;
     }
     el.className = "replay-scene-picker";
+    const selectedSceneKeys = Replay.getState().selectedSceneKeys;
     el.innerHTML = scenes.map((scene) => `
       <label class="replay-scene-option">
-        <input type="checkbox" data-scene-key="${escapeHtml(scene.key)}" checked />
+        <input type="checkbox" data-scene-key="${escapeHtml(scene.key)}" ${selectedSceneKeys.has(scene.key) ? "checked" : ""} />
         <span class="scene-copy">
           <span class="scene-name">${escapeHtml(scene.name)}</span>
           <span class="scene-meta">${escapeHtml(scene.model || "model unknown")}</span>
@@ -1416,8 +1705,44 @@
     `).join("");
   }
 
+  function collectPendingReplayTextEdits() {
+    const edits = new Map();
+    if (!dom.replayBreakdown) return edits;
+    dom.replayBreakdown.querySelectorAll(".bd-edit-input[data-edit-key]").forEach((input) => {
+      const editKey = input.dataset.editKey;
+      if (!editKey) return;
+      const currentText = Replay.getUserText(editKey);
+      if (input.value !== currentText) edits.set(editKey, input.value);
+    });
+    return edits;
+  }
+
+  function updateReplayEditControls(message = "") {
+    if (!dom.replayEditStatus) return;
+    const st = Replay.getState();
+    const hasSession = !!st.data && st.sourceEvents.length > 0;
+    const pending = hasSession ? collectPendingReplayTextEdits().size : 0;
+    const applied = hasSession ? Replay.getEditedCount() : 0;
+    dom.replayApplyEdits.disabled = !hasSession || pending === 0;
+    dom.replayResetEdits.disabled = !hasSession || (pending === 0 && applied === 0);
+    dom.replayExportEdits.disabled = !hasSession;
+    dom.replayEditStatus.className = hasSession ? "edit-status" : "edit-status bd-empty";
+    if (message) {
+      dom.replayEditStatus.textContent = message;
+    } else if (!hasSession) {
+      dom.replayEditStatus.textContent = "Load a session to edit actor text.";
+    } else if (pending) {
+      dom.replayEditStatus.textContent = `${plural(pending, "unapplied edit")} ready.`;
+    } else if (applied) {
+      dom.replayEditStatus.textContent = `${plural(applied, "applied edit")} · replay timing locked.`;
+    } else {
+      dom.replayEditStatus.textContent = "No edits.";
+    }
+  }
+
   // ---------- Replay UI ----------
   function setupReplayUIState() {
+    Replay.clearLoaded();
     dom.rPlayBtn.disabled = true;
     dom.rPauseBtn.disabled = true;
     dom.rStopBtn.disabled = true;
@@ -1437,6 +1762,7 @@
       dom.replayBreakdown.className = "bd-empty";
       dom.replayBreakdown.textContent = "Load a session to inspect timing.";
     }
+    updateReplayEditControls();
   }
 
   // Auto-hide menu button in replay during playback
@@ -1592,9 +1918,10 @@
         try {
           const data = JSON.parse(reader.result);
           if (!data.events) throw new Error("missing events[]");
-          Replay.load(data);
+          Replay.load(data, file.name);
         } catch (err) {
           alert("Invalid session JSON: " + err.message);
+          updateReplayEditControls();
         }
       };
       reader.readAsText(file);
@@ -1620,6 +1947,37 @@
       const sceneKey = input.dataset.sceneKey;
       if (!sceneKey) return;
       Replay.toggleSceneSelection(sceneKey, input.checked);
+    });
+    dom.replayBreakdown.addEventListener("input", (e) => {
+      if (e.target && e.target.classList.contains("bd-edit-input")) {
+        updateReplayEditControls();
+      }
+    });
+    dom.replayBreakdown.addEventListener("click", (e) => {
+      const btn = e.target && e.target.closest("[data-use-scripted]");
+      if (!btn) return;
+      const editKey = btn.dataset.useScripted;
+      const input = Array.from(dom.replayBreakdown.querySelectorAll(".bd-edit-input"))
+        .find((candidate) => candidate.dataset.editKey === editKey);
+      if (!input) return;
+      input.value = btn.dataset.scripted || "";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.focus();
+    });
+    dom.replayApplyEdits.addEventListener("click", () => {
+      const edits = collectPendingReplayTextEdits();
+      const changed = Replay.applyTextEdits(edits);
+      updateReplayEditControls(changed
+        ? `${plural(changed, "edit")} applied · replay timing locked.`
+        : "No changes to apply.");
+    });
+    dom.replayResetEdits.addEventListener("click", () => {
+      Replay.resetEdits();
+      updateReplayEditControls("Edits reset.");
+    });
+    dom.replayExportEdits.addEventListener("click", () => {
+      Replay.exportEditedSession();
+      updateReplayEditControls("Edited JSON exported.");
     });
 
     // Keyboard shortcuts (desktop)

@@ -640,6 +640,18 @@ body {
   line-height: 1.4;
 }
 
+.replay-edit-actions {
+  margin-top: 8px;
+}
+.edit-status {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg-elev);
+  padding: 9px 10px;
+  border-radius: 8px;
+}
+
 /* Session breakdown inspector */
 .bd-empty {
   font-size: 12px;
@@ -723,6 +735,53 @@ body {
 .bd-msg .bd-text {
   color: var(--text-dim);
   word-break: break-word;
+}
+.bd-edit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bd-edit-input {
+  width: 100%;
+  min-height: 58px;
+  resize: vertical;
+  background: rgba(0,0,0,0.18);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 7px;
+  padding: 7px 8px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  outline: none;
+}
+.bd-edit-input:focus {
+  border-color: rgba(255,255,255,0.32);
+  background: rgba(0,0,0,0.24);
+}
+.bd-scripted,
+.bd-readonly-text {
+  display: block;
+  white-space: pre-wrap;
+}
+.bd-scripted {
+  color: var(--text-mute);
+  font-size: 11px;
+}
+.bd-script-btn {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.07);
+  color: var(--text-dim);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 6px;
+  padding: 5px 7px;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.bd-script-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--text);
 }
 .bd-msg.ai .bd-text { color: var(--text); }
 .bd-msg .bd-meta {
