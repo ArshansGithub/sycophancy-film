@@ -2,7 +2,7 @@
 # SYCOPHANCY — Interactive Phone Prop
 
 **A custom browser-based chat interface built as a production tool for the short film *Sycophancy*.**
-
+https://arshansgithub.github.io/sycophancy-film/
 ## What this is
 
 This tool was built to solve a specific problem in filming *Sycophancy*, a short film about a teenager whose grief after a breakup is distorted by a sycophantic AI companion.
